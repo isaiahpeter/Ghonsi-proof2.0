@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 const allowedOrigins = [
   "https://ghonsiproof.com",
   "https://ghonsi-proof.vercel.app",
+  "https://ghonsi-proof2.vercel.app",
+  "https://ghonsi-proof2-0.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:5173", // Vite default
