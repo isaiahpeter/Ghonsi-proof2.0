@@ -4,7 +4,7 @@
 
 ![Ghonsi Proof Logo](frontend/public/assets/ghonsi-proof-logos/transparent-png-logo/ghonsi-proof1.png)
 
-**Blockchain-Powered Professional Verification Platform**
+**Blockchain-Powered Professional Verification Platform.**
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.3-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19.0-blue?style=flat&logo=react)](https://reactjs.org/)
