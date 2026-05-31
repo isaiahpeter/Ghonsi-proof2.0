@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, ArrowRight, Building2, Briefcase, Shield, FileText, 
@@ -1084,4 +1085,10 @@ function CreateProfileHirers() {
   );
 }
 
-export default CreateProfileHirers;
+export default function CreateProfileHirersPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0B0F1B]" />}>
+      <CreateProfileHirers />
+    </Suspense>
+  );
+}

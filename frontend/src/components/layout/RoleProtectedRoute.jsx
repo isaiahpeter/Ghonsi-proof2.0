@@ -1,9 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
-export default function RoleProtectedRoute({ children, allowedRole }) {
+function RoleProtectedRouteInner({ children, allowedRole }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userRole, setUserRole] = useState(null);
@@ -23,7 +23,6 @@ export default function RoleProtectedRoute({ children, allowedRole }) {
         const { data: { session } } = await supabase.auth.getSession();
         let userId = session ? session.user.id : localStorage.getItem('user_id');
         if (!userId) { if (isMounted) { setIsAuthenticated(false); setLoading(false); } return; }
-
         const { data: profileData } = await supabase.from('profiles').select('user_type').eq('user_id', userId).maybeSingle();
         if (profileData && isMounted) { setIsAuthenticated(true); setUserRole(profileData.user_type); }
         else if (isMounted) { setIsAuthenticated(false); }
@@ -56,4 +55,16 @@ export default function RoleProtectedRoute({ children, allowedRole }) {
   );
   if (!isAuthenticated || (allowedRole && userRole !== allowedRole)) return null;
   return children;
+}
+
+export default function RoleProtectedRoute({ children, allowedRole }) {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0B0F1B] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#C19A4A]"></div>
+      </div>
+    }>
+      <RoleProtectedRouteInner allowedRole={allowedRole}>{children}</RoleProtectedRouteInner>
+    </Suspense>
+  );
 }
