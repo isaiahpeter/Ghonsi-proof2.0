@@ -1,0 +1,10 @@
+# Basic usage
+npm run submit -- "GHONSI-PROOF-2026-001" "My Rust Smart Contract" "Implemented a secure Anchor program for proof-of-work verification" "Software Development"
+
+# With longer description 
+npm run submit -- "PROOF-DAPP-001" "Full E-commerce dApp" "Built React + Anchor + Phantom integration with on-chain escrow" "Software Development"
+
+# To test many at once 
+npm run submit -- "TEST-001" "Test Proof A" "Description A" "Research" &
+npm run submit -- "TEST-002" "Test Proof B" "Description B" "Design" &
+npm run submit -- "TEST-003" "Test Proof C" "Description C" "Writing" &

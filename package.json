@@ -1,22 +1,16 @@
 {
-  "name": "ghonsi-mainnet",
-  "version": "0.1.0",
+  "name": "ghonsi-proof-workspace",
+  "version": "1.0.0",
   "private": true,
+  "description": "Ghonsi Proof — monorepo workspace root",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "backend": "cd backend && npm run dev",
+    "dev:all": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\""
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4"
+    "concurrently": "^8.2.0"
   }
 }
