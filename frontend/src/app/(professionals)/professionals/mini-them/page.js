@@ -82,7 +82,7 @@ function MiniThemHandover() {
     try {
       if (mode === 'proof') {
         // Check if user has proofs
-        const { getUserProofs } = await import('../../../utils/proofsApi');
+        const { getUserProofs } = await import('@/utils/proofsApi');
         const userProofs = await getUserProofs(user.id);
         
         if (!userProofs || userProofs.length === 0) {
@@ -102,7 +102,7 @@ function MiniThemHandover() {
         
       } else if (mode === 'insights') {
         // Scan domain questions for personalized insights
-        const { getDomainQuestionsProfessionals } = await import('../../../utils/domainQuestionsApi');
+        const { getDomainQuestionsProfessionals } = await import('@/utils/domainQuestionsApi');
         const domainQuestions = await getDomainQuestionsProfessionals(user.id);
         
         if (!domainQuestions) {
