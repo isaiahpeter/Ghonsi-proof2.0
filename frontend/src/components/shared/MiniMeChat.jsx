@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MiniMeChat = () => {
-  const [messages, setMessages] = useState([]);
+  const [currentText, setCurrentText] = useState('');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+  const [isErasing, setIsErasing] = useState(false);
 
   const questions = [
     "Would you like to explore more leads in Lagos?",
@@ -13,34 +15,36 @@ const MiniMeChat = () => {
   ];
 
   useEffect(() => {
-    const showNextQuestion = () => {
-      if (currentQuestionIndex < questions.length) {
-        setMessages(prev => [...prev, { 
-          id: currentQuestionIndex, 
-          text: questions[currentQuestionIndex],
-          isTyping: true 
-        }]);
+    const currentQuestion = questions[currentQuestionIndex];
 
-        setTimeout(() => {
-          setMessages(prev => prev.map(msg => 
-            msg.id === currentQuestionIndex ? { ...msg, isTyping: false } : msg
-          ));
-
-          setTimeout(() => {
-            setCurrentQuestionIndex(prev => prev + 1);
-          }, 2000);
-        }, questions[currentQuestionIndex].length * 30 + 500);
+    if (isTyping && !isErasing) {
+      if (currentText.length < currentQuestion.length) {
+        const timer = setTimeout(() => {
+          setCurrentText(currentQuestion.slice(0, currentText.length + 1));
+        }, 30);
+        return () => clearTimeout(timer);
       } else {
-        setTimeout(() => {
-          setMessages([]);
-          setCurrentQuestionIndex(0);
-        }, 3000);
+        const timer = setTimeout(() => {
+          setIsTyping(false);
+          setIsErasing(true);
+        }, 2000);
+        return () => clearTimeout(timer);
       }
-    };
+    }
 
-    const timer = setTimeout(showNextQuestion, 500);
-    return () => clearTimeout(timer);
-  }, [currentQuestionIndex]);
+    if (isErasing) {
+      if (currentText.length > 0) {
+        const timer = setTimeout(() => {
+          setCurrentText(currentText.slice(0, -1));
+        }, 20);
+        return () => clearTimeout(timer);
+      } else {
+        setIsErasing(false);
+        setIsTyping(true);
+        setCurrentQuestionIndex((prev) => (prev + 1) % questions.length);
+      }
+    }
+  }, [currentText, currentQuestionIndex, isTyping, isErasing, questions]);
 
   return (
     <div className="bg-[#151925] rounded-2xl p-6 border border-[#C19A4A]/30 h-full flex flex-col">
@@ -62,10 +66,10 @@ const MiniMeChat = () => {
 
       {/* Chat Messages */}
       <div className="flex-1 space-y-4 overflow-hidden">
-        <AnimatePresence mode="popLayout">
-          {messages.map((message) => (
+        <AnimatePresence mode="wait">
+          {currentText && (
             <motion.div
-              key={message.id}
+              key="message"
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
@@ -79,19 +83,20 @@ const MiniMeChat = () => {
               </div>
               <div className="flex-1">
                 <div className="bg-[#0B0F1B] rounded-2xl rounded-tl-none px-4 py-3 border border-[#C19A4A]/20">
-                  {message.isTyping ? (
-                    <TypingText text={message.text} />
-                  ) : (
-                    <p className="text-white text-sm leading-relaxed">{message.text}</p>
-                  )}
+                  <p className="text-white text-sm leading-relaxed">
+                    {currentText}
+                    {isTyping && !isErasing && (
+                      <span className="inline-block w-1 h-4 bg-[#C19A4A] ml-1 animate-pulse" />
+                    )}
+                  </p>
                 </div>
               </div>
             </motion.div>
-          ))}
+          )}
         </AnimatePresence>
 
-        {/* Empty state when no messages */}
-        {messages.length === 0 && (
+        {/* Empty state when no text */}
+        {!currentText && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -120,28 +125,6 @@ const MiniMeChat = () => {
   );
 };
 
-const TypingText = ({ text }) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    if (currentIndex < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayedText(prev => prev + text[currentIndex]);
-        setCurrentIndex(prev => prev + 1);
-      }, 30);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, text]);
-
-  return (
-    <p className="text-white text-sm leading-relaxed">
-      {displayedText}
-      {currentIndex < text.length && (
-        <span className="inline-block w-1 h-4 bg-[#C19A4A] ml-1 animate-pulse" />
-      )}
-    </p>
-  );
-};
 
 export default MiniMeChat;
