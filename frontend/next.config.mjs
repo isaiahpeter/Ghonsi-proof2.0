@@ -10,8 +10,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'i.pravatar.cc' },
     ],
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
     config.resolve.fallback = { fs: false, net: false, tls: false };
+    
+    // Externalize pino-pretty for server-side builds
+    if (isServer) {
+      config.externals.push('pino-pretty');
+    }
+    
     return config;
   },
 };

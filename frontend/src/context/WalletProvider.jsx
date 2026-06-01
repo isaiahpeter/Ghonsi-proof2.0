@@ -35,14 +35,16 @@ export const WalletProvider = ({ children }) => {
 
     // Handle wallet connection
     const handleWalletConnect = useCallback((publicKey) => {
-        if (publicKey) {
+        if (publicKey && typeof window !== 'undefined') {
             localStorage.setItem('walletAddress', publicKey.toString());
         }
     }, []);
 
     // Handle wallet disconnect
     const handleWalletDisconnect = useCallback(() => {
-        localStorage.removeItem('walletAddress');
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('walletAddress');
+        }
     }, []);
 
     const value = {
@@ -53,7 +55,7 @@ export const WalletProvider = ({ children }) => {
 
     return (
         <ConnectionProvider endpoint={endpoint}>
-            <SolanaWalletProvider wallets={wallets} autoConnect>
+            <SolanaWalletProvider wallets={wallets} autoConnect={false}>
                 <WalletModalProvider>
                     <WalletContext.Provider value={value}>
                         {children}
