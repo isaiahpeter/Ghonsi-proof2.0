@@ -19,7 +19,7 @@ export default function Providers({ children }) {
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect={false}>
+      <WalletProvider wallets={wallets} autoConnect>
         <WalletModalProvider>
           <WalletContext.Provider value={walletContextValue}>
             <AgentProvider>

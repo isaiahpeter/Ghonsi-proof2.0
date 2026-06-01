@@ -86,7 +86,9 @@ const ReviewCard = ({ review, index }) => {
   const cardRef = useRef(null);
   const avatarRef = useRef(null);
   const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const prefersReducedMotion = typeof window !== 'undefined'
+  ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  : false;
 
   useCardTilt(cardRef);
 
