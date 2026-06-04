@@ -48,7 +48,7 @@ function Footer() {
           <div className="flex items-center gap-3 mb-3 mt-[-28px]">
             <Image src="/assets/ghonsi-proof-logos/transparent-png-logo/4.png" alt="Ghonsi Proof Logo" width={90} height={90} className="object-contain" />
           </div>
-          <p className="text-gray-400 text-sm mt-[-29px]">Prove Your Work Permanently.</p>
+          <p className="text-gray-400 text-sm mt-[-29px]">Making the Workforce Smarter.</p>
         </div>
 
         {/* Four-Column Navigation Section */}

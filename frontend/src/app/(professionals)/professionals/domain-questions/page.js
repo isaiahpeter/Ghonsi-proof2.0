@@ -378,7 +378,7 @@ function DomainQuestionsProfessionals() {
               Based on what you told us, your AI co-pilot is already configured for your market. The more you use it, the smarter it gets.
             </p>
             <button 
-              onClick={() => router.push('/mini-them-ai')} 
+              onClick={() => router.push('/professionals/mini-them-ai')} 
               className="bg-[#C19A4A] hover:bg-[#A8863D] text-black text-sm font-bold px-8 py-3.5 rounded-lg shadow-lg shadow-[#C19A4A]/20 transition-all transform hover:scale-105 active:scale-95 w-full max-w-xs flex items-center justify-center gap-2"
             >
               Meet Your Mini Me <ArrowRight className="w-4 h-4" />

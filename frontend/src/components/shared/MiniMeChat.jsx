@@ -9,9 +9,9 @@ const MiniMeChat = () => {
   const [isErasing, setIsErasing] = useState(false);
 
   const questions = [
-    "Would you like to explore more leads in Lagos?",
-    "Which audience segment are you targeting on TikTok/Instagram, WhatsApp, or price-sensitive buyers across Jiji?",
-    "Should we focus on a full-funnel campaign, quick-win WhatsApp automation, or localized SEO to dominate searches like 'best crypto wallet in Lagos'?"
+    "Want to generate more leads in Lagos or PortHarcourt?",
+    "Which audience are you targeting — Gen Z or professionals on the Island?",
+    "Should I run a quick competitor analysis for you?"
   ];
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const MiniMeChat = () => {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 space-y-4 overflow-hidden">
+      <div className="flex-1 space-y-4 overflow-hidden min-h-[120px]">
         <AnimatePresence mode="wait">
           {currentText && (
             <motion.div
@@ -82,7 +82,7 @@ const MiniMeChat = () => {
                 </svg>
               </div>
               <div className="flex-1">
-                <div className="bg-[#0B0F1B] rounded-2xl rounded-tl-none px-4 py-3 border border-[#C19A4A]/20">
+                <div className="bg-[#0B0F1B] rounded-2xl rounded-tl-none px-4 py-3 border border-[#C19A4A]/20 min-h-[60px]">
                   <p className="text-white text-sm leading-relaxed">
                     {currentText}
                     {isTyping && !isErasing && (
@@ -100,7 +100,7 @@ const MiniMeChat = () => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex items-center justify-center h-full"
+            className="flex items-center justify-center h-full min-h-[120px]"
           >
             <div className="text-center text-gray-500">
               <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="currentColor" viewBox="0 0 24 24">

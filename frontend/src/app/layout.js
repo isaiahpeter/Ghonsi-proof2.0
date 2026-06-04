@@ -5,13 +5,28 @@ import Navbar from '@/components/layout/Navbar';
 import FooterWrapper from '@/components/layout/FooterWrapper';
 
 export const metadata = {
-  title: 'Ghonsi proof — Your Marketing Expertise, Now Carried Forward Forever',
-  description: 'Helping talents and hirers harness expert insights in their domain.',
+  metadataBase: new URL('https://ghonsi-proof2.vercel.app'),
+  title: {
+    default: 'Ghonsi proof - Gain deeper insights into the Nigerian market',
+    template: '%s | Ghonsi Proof',
+  },
+  description: 'Understand Nigerian consumers better. Make smarter marketing decisions. Built for marketers, business owners, founders, and hirers who want to perform at a higher level.',
+  keywords: [
+    'Mini Me AI Agent',
+    'AI Agent for Nigerians',
+    'Proof of work',
+    'Talent discovery platform',
+    'AI co-pilot for freelancers',
+  ],
   icons: {
     icon: 'favicon.png',
     shortcut: 'favicon.png',
     apple: 'favicon.png',
   },
+};
+
+export const viewport = {
+  themeColor: '#C19A4A',
 };
 
 export default function RootLayout({ children }) {

@@ -7,35 +7,47 @@ import HeroButtons from '@/components/home/HeroButtons';
 import MiniMeChatWrapper from '@/components/home/MiniMeChatWrapper';
 import MiniMeVideoSection from '@/components/home/MiniMeVideoSection';
 import CardsSection from '@/components/home/CardsSection';
+import EverythingYouNeedSection from '@/components/home/EverythingYouNeedSection';
 import Reviews from '@/components/shared/Reviews';
 import WhatYouGetSection from '@/components/shared/WhatYouGetSection';
 import TrustedEcosystemSection from '@/components/shared/TrustedEcosystemSection';
 import FinalCTASection from '@/components/shared/FinalCTASection';
 
 export const metadata = {
-  title: 'Ghonsi Proof — Prove Your Work Permanently',
-  description: 'Mini Me is your personal AI co-pilot and consultant, trained on your domain knowledge to help you work smarter on every campaign, so you never start from scratch again.',
+  metadataBase: new URL('https://ghonsiproof.com'),
+  title: 'Gain deeper insights into the Nigerian market | Ghonsi proof',
+  description: 'Understand Nigerian consumers better. Make smarter marketing decisions. Built for marketers, business owners, founders, and hirers who want to perform at a higher level. Get started for free!',
+  keywords: [
+    'Mini Me AI Agent',
+    'AI Agent for Nigerians',
+    'Proof of work',
+    'Talent discovery platform',
+    'AI co-pilot for freelancers',
+    'on-chain portfolio',
+    'blockchain credential verification',
+    'Solana professional identity',
+    'Nigerian market insights',
+    'Web3 talent platform',
+  ],
   openGraph: {
-    title: 'Ghonsi Proof — Prove Your Work Permanently',
-    description: 'Blockchain-powered credential verification on Solana. Build your on-chain portfolio and prove your expertise permanently.',
+    title: 'Gain deeper insights into the Nigerian market | Ghonsi proof',
+    description: 'Understand Nigerian consumers better. Make smarter marketing decisions. Built for marketers, business owners, founders, and hirers who want to perform at a higher level. Get started for free!',
     url: 'https://ghonsiproof.com',
-    siteName: 'Ghonsi Proof',
-    images: [
-      {
-        url: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png',
-        width: 800,
-        height: 600,
-        alt: 'Ghonsi Proof Logo',
-      },
-    ],
+    siteName: 'Ghonsi proof',
+    images: [{ url: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png', width: 800, height: 600, alt: 'Ghonsi proof' }],
     locale: 'en_US',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Ghonsi Proof — Prove Your Work Permanently',
-    description: 'Blockchain-powered credential verification on Solana.',
+    title: 'Gain deeper insights into the Nigerian market | Ghonsi proof',
+    description: 'Understand Nigerian consumers better. Make smarter marketing decisions. Built for marketers, business owners, founders, and hirers who want to perform at a higher level.',
     images: ['/assets/ghonsi-proof-logos/transparent-png-logo/4.png'],
+  },
+  icons: {
+    icon: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png',
+    shortcut: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png',
+    apple: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png',
   },
 };
 
@@ -77,11 +89,9 @@ export default function HomePage() {
                 </span>
               </h1>
               <p className="text-base leading-relaxed mb-4">
-                <strong>
-                  Mini Me is your personal AI co-pilot and consultant, trained on your domain
-                  knowledge to help you work smarter on every campaign, so you never start from
-                  scratch again.
-                </strong>
+                Mini Me is your personal AI co-pilot and consultant, trained on your domain
+                knowledge to help you work smarter on every campaign, so you never start from
+                scratch again.
               </p>
               <div className="mt-6">
                 <MiniMeChatWrapper />
@@ -99,11 +109,9 @@ export default function HomePage() {
               </h1>
               <div className="max-w-3xl mx-auto">
                 <p className="text-base leading-relaxed mb-8">
-                  <strong>
-                    Mini Me is your personal AI co-pilot and consultant, trained on your domain
-                    knowledge to help you work smarter on every campaign, so you never start from
-                    scratch again.
-                  </strong>
+                  Mini Me is your personal AI co-pilot and consultant, trained on your domain
+                  knowledge to help you work smarter on every campaign, so you never start from
+                  scratch again.
                 </p>
               </div>
               <div className="max-w-2xl mx-auto mt-8">
@@ -131,7 +139,7 @@ export default function HomePage() {
               <h2 className="text-2xl md:text-4xl font-bold font-[Inter] mb-4">
                 You&apos;ve spent years mastering marketing.
               </h2>
-              <p className="text-xl md:text-2xl text-gray-300">
+              <p className="text-base text-gray-300">
                 Every new engagement forces you to start over.
               </p>
             </div>
@@ -202,35 +210,7 @@ export default function HomePage() {
               </h2>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
-              {[
-                {
-                  icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z',
-                  title: 'Your Best Work Becomes Your Living Portfolio',
-                  desc: 'Every insight and campaign mini me helps you create is captured as a shareable proof that tells your story 24/7, even when you are off-line.',
-                },
-                {
-                  icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-                  title: 'Turn Every Project Into Deeper Expertise',
-                  desc: 'Run marketing assessments, test your instincts, get personalized skill gap analysis, and receive targeted lessons drawn from real campaigns and expert frameworks.',
-                },
-                {
-                  icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z',
-                  title: "Stop Guessing What You Don't Know",
-                  desc: "Mini-Me surfaces the gaps you didn't know existed, then fills them with curated lessons from real campaigns. Start mastering what actually moves the needle.",
-                },
-              ].map((card) => (
-                <div key={card.title} className="bg-[#151925] rounded-2xl p-8 border border-[#C19A4A]/30">
-                  <div className="w-12 h-12 bg-[#C19A4A] rounded-lg flex items-center justify-center mb-6">
-                    <svg className="w-6 h-6 text-[#0B0F1B]" fill="currentColor" viewBox="0 0 24 24">
-                      <path d={card.icon} />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-4">{card.title}</h3>
-                  <p className="text-gray-300 text-base leading-relaxed">{card.desc}</p>
-                </div>
-              ))}
-            </div>
+            <EverythingYouNeedSection />
 
             <div className="flex justify-center">
               <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500 overflow-hidden w-full md:w-auto">
@@ -256,7 +236,7 @@ export default function HomePage() {
                 Your own AI agent learns your brand and captures insight from every output, so you
                 never start afresh with every hire
               </p>
-              <ul className="text-gray-300 text-base leading-relaxed mb-8 space-y-3 max-w-3xl mx-auto">
+              <ul className="text-gray-300 text-base leading-relaxed mb-1 space-y-3 max-w-3xl mx-auto">
                 {[
                   'Browse portfolios with timestamped results.',
                   'Your AI Agent onboards instantly on any new hire\'s knowledge base.',
@@ -272,7 +252,7 @@ export default function HomePage() {
               <CardsSection />
             </div>
 
-            <div className="flex justify-center mt-[-45px] mb-20">
+            <div className="flex justify-center mt-[-70px] md:mt-[-150px] mb-20">
               <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500 overflow-hidden w-full md:w-auto">
                 <a href="/hirers/dashboard" className="block w-full md:w-auto md:px-12 bg-[#0B0F1B] text-white py-3 rounded-xl font-semibold hover:bg-[#151925] transition-colors text-center">
                   Activate Your Team

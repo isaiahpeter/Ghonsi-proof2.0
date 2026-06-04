@@ -196,7 +196,7 @@ function Terms() {
               Simple Mini Me conversations of up to 20 messages per day are always free
             </li>
             <li className="text-[13px] text-[#CCC] leading-[1.6] mb-2 pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-[#C19A4A] before:font-bold">
-              When daily credits are exhausted, additional credits can be purchased at $0.10 per credit via X402
+              When daily credits are exhausted, additional credits can be purchased at $0.15 per credit via X402
             </li>
             <li className="text-[13px] text-[#CCC] leading-[1.6] mb-2 pl-5 relative before:content-['•'] before:absolute before:left-0 before:text-[#C19A4A] before:font-bold">
               Credit purchases are non-refundable once processed

@@ -4,7 +4,10 @@ import Footer from './Footer';
 
 export default function FooterWrapper() {
   const pathname = usePathname();
-  const hideFooter = pathname === '/professionals/portfolio' || pathname === '/professionals/mini-them';
+  const hideFooter = 
+  pathname === '/professionals/portfolio' || 
+  pathname === '/professionals/mini-them' ||
+  pathname === '/professionals/mini-them-ai';
   if (hideFooter) return null;
   return <Footer />;
 }

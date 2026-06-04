@@ -9,13 +9,33 @@ import JourneySection from '@/components/about/JourneySection';
 import DiscoverabilityButton from '@/components/about/DiscoverabilityButton';
 
 export const metadata = {
-  title: 'About — Ghonsi Proof',
-  description: 'Ghonsi Proof is a Web3 platform that turns real work into permanent, time-stamped on-chain records. Learn our story, values, and team.',
+  title: 'About',
+  description: 'Access research-backed insights into the Nigerian market. Built for marketers, business owners, founders and hirers who want to grow with confidence.',
+  keywords: [
+    'Mini Me AI Agent',
+    'AI Agent for Nigerians',
+    'Proof of work',
+    'Talent discovery platform',
+    'AI co-pilot for freelancers',
+    'Nigerian professionals',
+    'Web3 platform Nigeria',
+    'on-chain work history',
+    'blockchain portfolio Nigeria',
+  ],
   openGraph: {
-    title: 'About Ghonsi Proof',
-    description: 'We believe every builder deserves full credit for what they actually ship. Learn how we\'re building the proof of work layer on Solana.',
+    title: 'Expert market insights for Nigerian professionals | Ghonsi Proof',
+    description: 'Access research-backed insights into the Nigerian market. Built for marketers, business owners, founders and hirers who want to grow with confidence.',
     url: 'https://ghonsiproof.com/about',
     siteName: 'Ghonsi Proof',
+    images: [{ url: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png', width: 800, height: 600, alt: 'Ghonsi Proof' }],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Expert market insights for Nigerian professionals | Ghonsi Proof',
+    description: 'Access research-backed insights into the Nigerian market. Built for marketers, business owners, founders and hirers who want to grow with confidence.',
+    images: ['/assets/ghonsi-proof-logos/transparent-png-logo/4.png'],
   },
 };
 
@@ -53,24 +73,30 @@ export default function AboutPage() {
 
           {/* Mobile */}
           <h1 className="md:hidden text-base text-left leading-[1.4] mb-3 font-normal text-gray-300">
-            Ghonsi proof is a Web3 platform that turns real work into permanent, time-stamped
-            on-chain records and then helps you scale that work with your own personal AI agent.
+            Ghonsi proof is an AI-powered workforce intelligence platform that helps professionals capture, structure, and leverage their domain expertise, and helps hirers retain the knowledge from every engagement.
             <br /><br />
-            We believe every builder deserves full credit for what they actually ship. No more
-            scattered proofs across GitHub, Discord, X, and random folders. Your contributions
-            should be easy to showcase, impossible to fake, and powerful enough to grow with you.
+            The platform combines three interconnected layers: a personal AI agent called Mini Me trained on proprietary market research and the user&apos;s own domain inputs, a timestamped work record layer that anchors proof of professional output on the Solana blockchain, and a talent discovery and knowledge retention layer for hirers.
+            <br /><br />
+            Ghonsi proof addresses a fundamental problem in the global workforce. Knowledge built through professional engagement is consistently lost when contracts end. Professionals lose credit for what they have done. Hirers lose the expertise they paid for. We are the infrastructure that captures both sides of that value permanently.
+            <br /><br />
+            We are starting with marketing professionals, where local expertise is deepest, most undervalued, and most consistently lost after every contract. Additional domains will follow.
+            <br /><br />
+            Making the Workforce Smarter.
           </h1>
 
           {/* Desktop */}
           <div className="hidden md:block max-w-5xl mx-auto">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12">
               <p className="text-white/80 text-base md:text-lg leading-relaxed text-left">
-                Ghonsi proof is a Web3 platform that turns real work into permanent, time-stamped
-                on-chain records and then helps you scale that work with your own personal AI agent.
+                Ghonsi proof is an AI-powered workforce intelligence platform that helps professionals capture, structure, and leverage their domain expertise, and helps hirers retain the knowledge from every engagement.
                 <br /><br />
-                We believe every builder deserves full credit for what they actually ship. No more
-                scattered proofs across GitHub, Discord, X, and random folders. Your contributions
-                should be easy to showcase, impossible to fake, and powerful enough to grow with you.
+                The platform combines three interconnected layers: a personal AI agent called Mini Me trained on proprietary market research and the user&apos;s own domain inputs, a timestamped work record layer that anchors proof of professional output on the Solana blockchain, and a talent discovery and knowledge retention layer for hirers.
+                <br /><br />
+                Ghonsi proof addresses a fundamental problem in the global workforce. Knowledge built through     professional engagement is consistently lost when contracts end. Professionals lose credit for what     they have done. Hirers lose the expertise they paid for. We are the infrastructure that captures    both  sides of that value permanently.
+                <br /><br />
+                We are starting with marketing professionals, where local expertise is deepest, most undervalued,    and  most consistently lost after every contract. Additional domains will follow.
+                <br /><br />
+                Making the Workforce Smarter.
               </p>
             </div>
           </div>
@@ -85,14 +111,10 @@ export default function AboutPage() {
           <div className="relative max-w-4xl mx-auto mb-12">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12 relative">
               <p className="text-white/80 text-base md:text-lg leading-relaxed">
-                Ghonsi comes from &quot;ghonsi&quot; — a word in the Ika language, spoken by the indigenous
-                people of Igbanke and Agbor in Nigeria. It means &quot;to showcase&quot; or &quot;to prove
+                The name &quot;Ghonsi&quot; comes from the Ika language spoken in Igbanke and Agbor, Nigeria. It means &quot;to showcase&quot; or &quot;to prove
                 something.&quot; It is pronounced as &quot;hon-see&quot; with a silent &quot;g&quot;.
                 <br /><br />
-                This name carries deep cultural meaning for us. Ghonsi proof was born from the
-                simple desire to help people proudly showcase who they are and what they&apos;ve done —
-                with real, tamper-proof evidence. Starting from African roots and built for the
-                global tech (Web3) community, we created a place where your work speaks for itself.
+                We chose this name because it perfectly captures our mission: helping professionals showcase their real work with permanent, tamper-proof evidence. Born from African roots, built for the global workforce.
               </p>
               <div className="absolute left-1/2 -translate-x-1/2 -bottom-6 w-0 h-0 border-l-[24px] border-l-transparent border-r-[24px] border-r-transparent border-t-[24px] border-t-white/10" />
             </div>
@@ -135,19 +157,8 @@ export default function AboutPage() {
             <div className="flex-1 text-white/80 text-base leading-relaxed space-y-4">
               <p>It started with a clear problem: In Web3, genuine builders struggle to prove their value. Portfolios are scattered, claims are hard to verify, and recruiters waste time sorting truth from hype.</p>
               <p>We began as proofHub — a simple tool to help professionals document their work as it happens. Then we rebuilt everything on Solana to create a tamper-proof professional identity layer.</p>
-              <p className="font-semibold text-white">Today, Ghonsi proof lets you:</p>
-              <ul className="list-none space-y-2 ml-4">
-                <li className="flex items-start"><span className="text-[#C19A4A] mr-2">•</span><span>Upload your real work and verify it on-chain in seconds</span></li>
-                <li className="flex items-start"><span className="text-[#C19A4A] mr-2">•</span><span>Build a permanent, shareable portfolio that anyone can trust instantly</span></li>
-              </ul>
-              <p className="font-semibold text-white pt-2">But we didn&apos;t stop at proof.</p>
-              <p>Real proof is the perfect foundation for something bigger.</p>
-              <p>When your past work is permanently recorded on-chain with summaries, files, and context, it becomes rich, trustworthy data. That data lets us do something powerful: create your Mini-Them AI Agent.</p>
-              <p>Your Mini-Them is a personal digital twin trained directly on your own on-chain proofs. It learns exactly how you work: your skills, your style, your voice, your standards.</p>
-              <p>You hand over your way of working once (in three quick steps), and your Mini-Them starts executing real tasks on the platform, writing reports, updating designs, completing gigs in the Job Marketplace, or replying to clients, all while staying 100% true to you.</p>
-              <p>Every output the Mini-Them produces is automatically turned into a new on-chain proof. Clients rate the whole Human + Mini-Them Team together.</p>
-              <p className="font-semibold text-white">This is how humans and AI agents become one stronger unit on Ghonsi proof.</p>
-              <p>proof is no longer just a record of the past, it powers your future productivity. You focus on high-value creative work while your team handles volume, and your portfolio grows automatically with verified, high-quality output.</p>
+              <p>Today, that foundation has grown into something bigger. We saw that the same pain — lost credit and disappearing expertise — exists far beyond Web3. So we evolved Ghonsi proof into a workforce intelligence platform. We built Mini Me, a personal AI agent grounded in deep Nigerian market research, to help professionals execute work and grow their expertise. It also supports founders who struggle to understand the Nigerian market and international companies looking to enter it successfully. We added a knowledge retention layer so hirers don&apos;t lose the expertise they paid for after every engagement, while the permanent on-chain proof layer remains the foundation of trust.</p>
+              <p>What began as a way to give builders lasting credit has become infrastructure that captures professional knowledge, proves real work, and makes both talent and hirers smarter with every engagement.</p>
             </div>
           </div>
 
@@ -156,14 +167,8 @@ export default function AboutPage() {
             <div className="text-white/80 text-base leading-relaxed space-y-4">
               <p>It started with a clear problem: In Web3, genuine builders struggle to prove their value. Portfolios are scattered, claims are hard to verify, and recruiters waste time sorting truth from hype.</p>
               <p>We began as proofHub — a simple tool to help professionals document their work as it happens. Then we rebuilt everything on Solana to create a tamper-proof professional identity layer.</p>
-              <p className="font-semibold text-white">Today, Ghonsi proof lets you:</p>
-              <ul className="list-none space-y-2 ml-4">
-                <li className="flex items-start"><span className="text-[#C19A4A] mr-2">•</span><span>Upload your real work and verify it on-chain in seconds</span></li>
-                <li className="flex items-start"><span className="text-[#C19A4A] mr-2">•</span><span>Build a permanent, shareable portfolio that anyone can trust instantly</span></li>
-              </ul>
-              <p className="font-semibold text-white pt-2">But we didn&apos;t stop at proof.</p>
-              <p>Real proof is the perfect foundation for something bigger. Your Mini-Them is a personal digital twin trained directly on your own on-chain proofs.</p>
-              <p className="font-semibold text-white">This is how humans and AI agents become one stronger unit on Ghonsi proof.</p>
+              <p>Today, that foundation has grown into something bigger. We saw that the same pain — lost credit and disappearing expertise — exists far beyond Web3. So we evolved Ghonsi proof into a workforce intelligence platform. We built Mini Me, a personal AI agent grounded in deep Nigerian market research, to help professionals execute work and grow their expertise. It also supports founders who struggle to understand the Nigerian market and international companies looking to enter it successfully. We added a knowledge retention layer so hirers don&apos;t lose the expertise they paid for after every engagement, while the permanent on-chain proof layer remains the foundation of trust.</p>
+              <p>What began as a way to give builders lasting credit has become infrastructure that captures professional knowledge, proves real work, and makes both talent and hirers smarter with every engagement.</p>
             </div>
             <div className="w-full">
               <div className="relative p-[3px] rounded-2xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500">
@@ -187,7 +192,9 @@ export default function AboutPage() {
                 Discoverability and Hiring
               </h2>
               <p className="text-white/70 text-base leading-relaxed max-w-2xl">
-                Our discovery layer makes it easy to explore real talents, see what people (and their teams) are building, and request work directly. With the upcoming Job Marketplace, companies can post gigs that both humans and Mini-Them agents can execute, creating faster, more reliable delivery for everyone.
+                Hirers can browse professionals by domain expertise and timestamped, uneditable work history. They can send portfolio requests directly to talents and post project opportunities.
+                <br /><br />
+                With each completed engagement, the hirer&apos;s knowledge base is automatically updated with reusable outputs derived from real work.
               </p>
             </div>
             <div className="flex-shrink-0">
@@ -201,7 +208,9 @@ export default function AboutPage() {
                 Discoverability and Hiring
               </h2>
               <p className="text-white/70 text-base leading-relaxed">
-                Our discovery layer makes it easy to explore real talents, see what people (and their teams) are building, and request work directly.
+                Hirers can browse professionals by domain expertise and timestamped, uneditable work history. They can send portfolio requests directly to talents and post project opportunities.
+                <br /><br />
+                With each completed engagement, the hirer&apos;s knowledge base is automatically updated with reusable outputs derived from real work.
               </p>
             </div>
             <DiscoverabilityButton fullWidth />
@@ -267,7 +276,7 @@ export default function AboutPage() {
         {/* ── CLOSING LINE ── */}
         <div className="py-4 italic font-[Inter]">
           <p className="bg-gradient-to-r from-gray-400 to-[#C19A4A] bg-clip-text text-transparent text-lg text-center mb-4 max-w-3xl mx-auto">
-            Welcome to Ghonsi proof! Where your real work gets proved on-chain, and your Human + AI Team becomes unstoppable.
+            Welcome to Ghonsi proof! Where your real work gets proved on-chain, and professional knowledge compounds instead of disappearing.
           </p>
         </div>
 

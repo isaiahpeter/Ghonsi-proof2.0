@@ -27,7 +27,7 @@ const teamMembers = [
   },
   {
     name: 'Nie Osaoboh',
-    role: 'Product Lead',
+    role: 'Product Designer',
     bio: 'Nie is a product designer with a background in digital marketing, focused on creating simple, user-friendly experiences. He designs products that are visually appealing and easy to use, helping bring ideas to life seamlessly.',
     image: '/assets/team/nie.jpg',
     website: 'https://linkedin.com/in/nie-osaoboh',

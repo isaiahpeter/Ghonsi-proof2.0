@@ -31,17 +31,8 @@ export default function FinalCTASection({
           Carry your expertise forward. Build teams that never lose knowledge.
         </motion.p>
 
-        <motion.p
-          className="text-white/40 text-sm max-w-xl mx-auto mt-3"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-        >
-          Start free today. No credit card required
-        </motion.p>
-
         <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-12"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.3 }}
@@ -65,6 +56,15 @@ export default function FinalCTASection({
             <span className="group-hover:translate-x-0.5 transition-transform">→</span>
           </motion.a>
         </motion.div>
+
+        <motion.p
+          className="text-white/40 text-sm max-w-xl mx-auto mt-3"
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+        >
+          Start free today. No credit card required
+        </motion.p>
       </div>
 
       {/* Ambient glow */}

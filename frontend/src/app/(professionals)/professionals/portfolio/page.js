@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Copy, ExternalLink, FileText, Wallet, Mail, Calendar, CheckCircle, Sparkles, ArrowRight, Brain, Search, Pencil, Download, Plus, Bot, X, Loader2, FileCheck, Link as LinkIcon, Share2 } from 'lucide-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Player } from '@lottiefiles/react-lottie-player';
 import { faInstagram, faXTwitter, faLinkedinIn, faGithub } from '@fortawesome/free-brands-svg-icons';
 import { getCurrentUser } from '@/utils/supabaseAuth';
 import { getUserProofs } from '@/utils/proofsApi';
@@ -1176,12 +1177,17 @@ const Portfolio = () => {
             
             {/* Bot Button */}
             <button
-              onClick={() => router.push('/mini-them-control')}
+              onClick={() => router.push('/professionals/mini-them-control')}
               onMouseEnter={() => setShowBotTooltip(true)}
               onMouseLeave={() => setShowBotTooltip(false)}
-              className="w-14 h-14 rounded-full bg-gradient-to-br from-[#C19A4A] to-[#d9b563] flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(193,154,74,0.6)] transition-all duration-300 hover:scale-110 group"
+              className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_30px_rgba(193,154,74,0.6)] transition-all duration-300 hover:scale-110 group"
             >
-              <Bot size={28} className="text-[#0B0F1B] group-hover:scale-110 transition-transform" />
+              <Player
+                autoplay
+                loop
+                src="/assets/animations/lottie_transparent.json"
+                style={{ width: 100, height: 100 }}
+              />
             </button>
           </div>
         </div>

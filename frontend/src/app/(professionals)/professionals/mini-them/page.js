@@ -172,7 +172,7 @@ function MiniThemHandover() {
       
       // Show success and redirect
       alert('Success! Your Human + Mini-Them Team is now live.');
-      router.push('/mini-them-control');
+      router.push('/professionals/mini-them-control');
     } catch (error) {
       console.error('Activation error:', error);
       alert('Failed to activate agent. Please try again.');

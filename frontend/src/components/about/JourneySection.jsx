@@ -18,14 +18,32 @@ const timelineItems = [
   },
   {
     period: 'Q2 2026',
-    title: 'Community Growth',
-    desc: 'Discovery layer, hiring features, and Human + Mini-Them rollout.',
+    title: 'AI Marketing Domain Expertise',
+    desc: 'Mini Me AI agent activation and hiring side introduction.',
     isLast: false,
   },
   {
     period: 'Q3 2026',
-    title: 'Ecosystem Expansion',
-    desc: 'Deeper team capabilities and ecosystem growth.',
+    title: 'Community and Ecosystem Expansion',
+    desc: 'Partnerships, and deeper team capabilities.',
+    isLast: false,
+  },
+  {
+    period: 'Q4 2026',
+    title: 'Full Hiring Activation',
+    desc: 'Complete job marketplace and knowledge retention layer for hirers.',
+    isLast: false,
+  },
+  {
+    period: 'Q1 2027',
+    title: 'Talent Intelligence Layer',
+    desc: 'Job readiness mapping and talent management.',
+    isLast: false,
+  },
+  {
+    period: 'Q2 2027',
+    title: 'Domain Expansion',
+    desc: 'Expertise expansion beyond marketing to other knowledge-work verticals.',
     isLast: true,
   },
 ];
@@ -131,7 +149,7 @@ export default function JourneySection() {
           onClick={() => router.push('/professionals/mini-them')}
           className="w-full bg-transparent border-2 border-white text-white py-3 rounded-xl font-semibold hover:bg-white/10 transition-colors"
         >
-          Launch My Mini-Them Agent
+          Launch My Mini-Me
         </button>
       </motion.div>
     </section>

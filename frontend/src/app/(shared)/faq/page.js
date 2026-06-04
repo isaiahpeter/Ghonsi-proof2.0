@@ -9,13 +9,32 @@ import { faBook } from '@fortawesome/free-solid-svg-icons';
 import FaqAccordion from '@/components/faq/FaqAccordion';
 
 export const metadata = {
-  title: 'FAQ — Ghonsi Proof',
+  title: 'FAQ',
   description: 'Find answers to common questions about Ghonsi Proof and building your on-chain professional identity on Solana.',
+  keywords: [
+    'Mini Me AI Agent',
+    'AI Agent for Nigerians',
+    'Proof of work',
+    'Talent discovery platform',
+    'AI co-pilot for freelancers',
+    'Ghonsi Proof FAQ',
+    'on-chain credential questions',
+    'Solana wallet verification',
+  ],
   openGraph: {
-    title: 'FAQ — Ghonsi Proof',
+    title: 'FAQ — Ghonsi proof',
     description: 'Frequently asked questions about Ghonsi Proof, on-chain credential verification, wallet support, and hiring.',
     url: 'https://ghonsiproof.com/faq',
     siteName: 'Ghonsi Proof',
+    images: [{ url: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png', width: 800, height: 600, alt: 'Ghonsi Proof' }],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'FAQ — Ghonsi Proof',
+    description: 'Frequently asked questions about Ghonsi Proof, on-chain credential verification, wallet support, and hiring.',
+    images: ['/assets/ghonsi-proof-logos/transparent-png-logo/4.png'],
   },
 };
 

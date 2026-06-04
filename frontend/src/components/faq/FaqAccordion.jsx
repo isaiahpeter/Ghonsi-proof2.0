@@ -11,39 +11,63 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 const faqs = [
   {
     question: 'What is Ghonsi Proof?',
-    answer: 'Ghonsi proof is the on-chain trust engine for the Web3 workforce. We transform scattered contributions (work histories, career milestones, certificates, career breaks, etc) into a single verifiable professional identity.',
+    answer: 'Ghonsi proof is an AI-powered workforce intelligence platform that helps professionals capture, structure, and leverage their domain expertise while helping hirers retain the knowledge from every engagement. It combines a personal AI agent (Mini Me), permanent work portfolio on Solana, and a knowledge retention layer for hirers.',
   },
   {
-    question: 'How do I get my proofs timestamped on-chain?',
-    answer: 'We timestamp your proofs by helping you anchor it to the blockchain and make use of the timestamp nature of the blockchain.',
+    question: 'What problem does Ghonsi proof solve?',
+    answer: 'Professional knowledge is consistently lost when contracts end. Professionals lose credit for their work, and hirers lose the expertise they paid for. Ghonsi proof captures both the deliverable and the knowledge behind it, making expertise permanent and compounding for both parties.',
   },
   {
-    question: 'What kind of proof can I upload?',
-    answer: 'Anything that validates your work: screenshots of acceptance emails, links to articles, contribution certificates, or records of specific project roles.',
+    question: 'What is Mini Me?',
+    answer: 'Mini Me is your personal AI agent. It is trained on proprietary research on the Nigerian market and your own domain inputs and work records. It functions as an assistant, an expert, and a co-pilot depending on how you engage with it.',
   },
   {
-    question: 'Is my data safe and private?',
-    answer: 'Yes. Your identity is tied to your wallet, which you control. You decide who sees your portfolio, and your profile. Only privacy optimized data are stored onchain.',
+    question: 'How do I get started as a talent?',
+    answer: 'Sign up and get Mini Me activated immediately. You can start generating proposals, campaign plans, reports, and other professional outputs with Mini Me, then save completed work as on-chain proof records with one click',
   },
   {
-    question: 'Can I share my profile?',
-    answer: 'Yes. Every Ghonsi proof profile has a shareable link you can use on social media or in job applications.',
+    question: 'Do I need to upload my proof of work on-chain before using the platform?',
+    answer: 'No. You can start using Mini Me right away to generate proposals, campaign plans, reports, and other professional outputs without uploading anything on-chain. Putting your work on-chain is completely optional. However, we strongly recommend it. Talents with verified on-chain proof records get priority visibility in the talent discovery layer, making it easier for hirers to find and trust your work.',
   },
   {
-    question: 'Which wallets are supported?',
-    answer: 'We are built on Solana and support all major Solana-compatible wallets. Including Phantom and Solflare.',
+    question: 'How does the on-chain proof work?',
+    answer: 'When you save a proof record, key metadata (including a cryptographic hash and timestamp) is anchored on the Solana blockchain. This creates an immutable, traceable record of your work. The full files and context remain private to you and off-chain unless you choose to share them.',
   },
   {
-    question: 'Can companies use this for hiring?',
-    answer: 'Yes. Founders, DAOs and Hirers use Ghonsi proof to find and verify talent based on proven work and contributions.',
+    question: 'How does knowledge retention work for hirers?',
+    answer: 'After every completed engagement, reusable outputs such as templates, workflows, campaign structures, and best practices are added to your knowledge base. This institutional memory compounds with every new hire, so you don’t lose expertise when a contract ends.',
   },
   {
-    question: 'What if I lose access to my wallet?',
-    answer: 'We recommend using our email backup feature during sign-up to ensure you can always recover your verified portfolio.',
+    question: 'Can hirers browse and request portfolios?',
+    answer: 'Yes, hirers can browse talent by expertise, send portfolio requests directly to talents (which they must approve before sharing). You can also post job opportunities on Ghonsi.',
   },
   {
-    question: 'Can I delete my account?',
-    answer: 'Yes, you can delete your account at anytime but data recorded on the blockchain is permanent and immutable.',
+    question: 'Is there a commission on hires?',
+    answer: 'No, we does not charge any commission on hires or engagements.',
+  },
+  {
+    question: 'Is my work and data private?',
+    answer: 'Yes, you control what is private, what is shared, and what becomes public. Portfolio sharing is always consent-based. On-chain records only store cryptographic hashes and timestamps, not your full work or personal information.',
+  },
+  {
+    question: 'Do I need to understand blockchain to use Ghonsi proof?',
+    answer: 'No. The blockchain layer works in the background. Your interaction with the platform is simple and chat-like, you don&apos;t need technical knowledge.',
+  },
+  {
+    question: 'Can Mini Me make mistakes?',
+    answer: 'Mini Me is a powerful assistant, but like any AI, its outputs should be reviewed before use. You remain in control of all final work and decisions',
+  },
+  {
+    question: 'How do payments work for talents?',
+    answer: 'Every talent receives free AI credits daily, once exhausted additional credits can be purchased in bits (check pricing page for more details). There is no subscription required.',
+  },
+  {
+    question: 'How much does it cost for hirers?',
+    answer: 'Hirers can start with one free job post and three portfolio requests. After that, hirer access is available through a flat monthly subscription fee (check pricing page for more details), which includes unlimited talent discovery, portfolio requests, job posts, and access to the knowledge retention layer.',
+  },
+  {
+    question: 'Can training institutions, academies and job marketplaces integrate with Ghonsi proof?',
+    answer: 'Yes, academies, institutions and job marketplace can integrate via our enterprise API custom to their needs (contact us for more details).',
   },
 ];
 

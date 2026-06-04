@@ -7,13 +7,31 @@ import { Mail, MessageSquare, ArrowRight } from 'lucide-react';
 import ContactForm from '@/components/contact/ContactForm';
 
 export const metadata = {
-  title: 'Contact Us — Ghonsi Proof',
-  description: 'Get in touch with the Ghonsi Proof team. Ask about verification, partnerships, or anything else. We respond within 24 hours.',
+  title: 'Contact Us',
+  description: 'Get in touch with the Ghonsi proof team. Ask about verification, partnerships, or anything else. We respond within 24 hours.',
+  keywords: [
+    'Mini Me AI Agent',
+    'AI Agent for Nigerians',
+    'Proof of work',
+    'Talent discovery platform',
+    'AI co-pilot for freelancers',
+    'contact Ghonsi proof',
+    'partnership inquiry',
+  ],
   openGraph: {
-    title: 'Contact Us — Ghonsi Proof',
+    title: 'Contact Us — Ghonsi proof',
     description: 'Have questions about verification or partnership opportunities? We are here to help.',
     url: 'https://ghonsiproof.com/contact',
-    siteName: 'Ghonsi Proof',
+    siteName: 'Ghonsi proof',
+    images: [{ url: '/assets/ghonsi-proof-logos/transparent-png-logo/4.png', width: 800, height: 600, alt: 'Ghonsi proof' }],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Us — Ghonsi proof',
+    description: 'Have questions about verification or partnership opportunities? We are here to help.',
+    images: ['/assets/ghonsi-proof-logos/transparent-png-logo/4.png'],
   },
 };
 

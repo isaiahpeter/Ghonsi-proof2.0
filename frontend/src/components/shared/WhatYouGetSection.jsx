@@ -18,7 +18,7 @@ const WhatYouGetSection = () => {
     '✓ Get core Marketing expert',
     '✓ Advance portfolio & knowledge capture',
     '✓ Run marketing assessments & skill tests',
-    '✓ Chat with Mini Me (limited daily)',
+    '✓ Chat with Mini Me',
     '✓ Shareable portfolio links'
   ];
 
@@ -106,7 +106,7 @@ const WhatYouGetSection = () => {
             </ul>
             <div className="border-t border-white/10 pt-6">
               <p className="text-white font-semibold mb-2">Pay only when you need more</p>
-              <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.10 per extra credit</p>
+              <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.15 per extra credit</p>
               <p className="text-gray-400 text-xs">Instant top-up • No subscription required</p>
             </div>
           </motion.div>
@@ -212,7 +212,7 @@ const WhatYouGetSection = () => {
             </ul>
             <div className="border-t border-white/10 pt-6">
               <p className="text-white font-semibold mb-2">Pay only when you need more</p>
-              <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.10 per extra credit</p>
+              <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.15 per extra credit</p>
               <p className="text-gray-400 text-xs">Instant top-up • No subscription required</p>
             </div>
           </motion.div>

@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import { Eye, Users, Lightbulb, Accessibility } from 'lucide-react';
 
 const valuesData = [
-  { icon: Eye, title: 'Transparency', desc: 'Every proof and every agent action is provably true on-chain' },
-  { icon: Users, title: 'Accessibility', desc: 'Building tools that empower everyone in Web3 & tech' },
-  { icon: Lightbulb, title: 'Innovation', desc: 'Merging real human proof with personal AI agents to 10× productivity while keeping trust at the core' },
-  { icon: Accessibility, title: 'Inclusivity', desc: 'Creating opportunities for all builders' },
+  { icon: Eye, title: 'Transparency', desc: 'We keep every proof and every Mini Me action permanently true and verifiable' },
+  { icon: Users, title: 'Accessibility', desc: 'Building tools that empower professionals and hirers at every stage.' },
+  { icon: Lightbulb, title: 'Innovation', desc: 'Merging real human work with a personal AI agent to multiply impact while keeping trust at the core.' },
+  { icon: Accessibility, title: 'Inclusion', desc: 'Creating lasting opportunities for professionals across domains and career stages.' },
 ];
 
 export default function ValuesCarousel() {

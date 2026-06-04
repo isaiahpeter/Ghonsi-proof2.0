@@ -1,0 +1,31 @@
+name: Keep Render Services Alive
+
+on:
+  schedule:
+    # Runs every 10 minutes
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Main Backend
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://ghonsi2-0-backend.onrender.com/health || echo "000")
+          echo "Backend response: $response"
+          if [ "$response" = "000" ]; then
+            echo "⚠️ Backend did not respond"
+          else
+            echo "✅ Backend is alive - Status: $response"
+          fi
+
+      - name: Ping Extraction API
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://ghonsi2-0-extraction-api.onrender.com/api/debug || echo "000")
+          echo "Extraction API response: $response"
+          if [ "$response" = "000" ]; then
+            echo "⚠️ Extraction API did not respond"
+          else
+            echo "✅ Extraction API is alive - Status: $response"
+          fi
