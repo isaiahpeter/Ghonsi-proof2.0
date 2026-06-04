@@ -1,12 +1,16 @@
 'use client';
 // ─────────────────────────────────────────────────────────────────────────────
-// ContactForm — client component
-// Contains all interactive state: form fields, dropdown, success modal.
-// Extracted from contact/page.js so the page shell can be a Server Component.
+// ContactForm — client component with EmailJS integration
+// Sends form submissions to ghonsiproof@gmail.com via EmailJS.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useRef, useEffect } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+
+const SERVICE_ID  = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+const TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+const PUBLIC_KEY  = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
 
 const messageTemplates = {
   default: '',
@@ -20,21 +24,25 @@ const messageTemplates = {
 
 const subjects = [
   { value: 'verification', label: 'Verification help' },
-  { value: 'feedback', label: 'General feedback' },
-  { value: 'partnership', label: 'Partnership Inquiry' },
-  { value: 'other', label: 'Other' },
+  { value: 'feedback',     label: 'General feedback' },
+  { value: 'partnership',  label: 'Partnership Inquiry' },
+  { value: 'other',        label: 'Other' },
 ];
 
 export default function ContactForm() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [charCount, setCharCount] = useState(0);
+  const [name,            setName]            = useState('');
+  const [email,           setEmail]           = useState('');
+  const [charCount,       setCharCount]       = useState(0);
   const [selectedSubject, setSelectedSubject] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [message, setMessage] = useState('');
+  const [selectedValue,   setSelectedValue]   = useState('');
+  const [isDropdownOpen,  setIsDropdownOpen]  = useState(false);
+  const [showModal,       setShowModal]       = useState(false);
+  const [message,         setMessage]         = useState('');
+  const [isSending,       setIsSending]       = useState(false);
+  const [sendError,       setSendError]       = useState('');
 
   const dropdownRef = useRef(null);
+  const formRef     = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -48,6 +56,7 @@ export default function ContactForm() {
 
   const handleSubjectChange = (value, label) => {
     setSelectedSubject(label);
+    setSelectedValue(value);
     setIsDropdownOpen(false);
     const newMessage = messageTemplates[value] || messageTemplates.default;
     setMessage(newMessage);
@@ -59,14 +68,39 @@ export default function ContactForm() {
     setCharCount(e.target.value.length);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowModal(true);
-    setName('');
-    setEmail('');
-    setSelectedSubject('');
-    setMessage('');
-    setCharCount(0);
+    setSendError('');
+    setIsSending(true);
+
+    try {
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          from_name:  name,
+          from_email: email,
+          subject:    selectedSubject || 'General enquiry',
+          message:    message,
+          reply_to:   email,
+        },
+        PUBLIC_KEY
+      );
+
+      // Success — clear form and show modal
+      setShowModal(true);
+      setName('');
+      setEmail('');
+      setSelectedSubject('');
+      setSelectedValue('');
+      setMessage('');
+      setCharCount(0);
+    } catch (error) {
+      console.error('EmailJS error:', error);
+      setSendError('Failed to send your message. Please try again or email us directly at ghonsiproof@gmail.com');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -74,7 +108,15 @@ export default function ContactForm() {
       <div className="bg-[#131825] rounded-2xl p-6 md:p-8 border border-gray-800 shadow-xl mb-8 lg:mb-3">
         <h2 className="font-semibold text-lg mb-6">Send us a Message</h2>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Error banner */}
+        {sendError && (
+          <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-xs text-red-300">
+            {sendError}
+          </div>
+        )}
+
+        <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
+
           {/* Name */}
           <div className="space-y-2">
             <label className="block text-sm font-medium text-white">Name *</label>
@@ -120,13 +162,7 @@ export default function ContactForm() {
                   className="w-5 h-5 transition-transform duration-200"
                   style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}
                 >
-                  <path
-                    stroke="#9CA3AF"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="1.5"
-                    d="M6 8l4 4 4-4"
-                  />
+                  <path stroke="#9CA3AF" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M6 8l4 4 4-4" />
                 </svg>
               </button>
               {isDropdownOpen && (
@@ -162,10 +198,19 @@ export default function ContactForm() {
 
           <button
             type="submit"
-            className="w-full bg-[#C19A4A] text-[#0B0F1B] font-bold py-3.5 rounded-lg hover:bg-[#d4a852] transition-colors mt-2"
+            disabled={isSending}
+            className="w-full bg-[#C19A4A] text-[#0B0F1B] font-bold py-3.5 rounded-lg hover:bg-[#d4a852] transition-colors mt-2 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Send Message
+            {isSending ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Sending...
+              </>
+            ) : (
+              'Send Message'
+            )}
           </button>
+
         </form>
       </div>
 

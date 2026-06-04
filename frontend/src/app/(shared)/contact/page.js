@@ -43,10 +43,9 @@ export default function ContactPage() {
 
         {/* ── Page heading (static — server rendered) ── */}
         <div className="text-center mb-8 space-y-3 pt-4">
-          <h1 className="text-4xl font-bold font-[Inter] text-white">Get in Touch</h1>
+          <h1 className="text-4xl font-bold font-[Inter] text-white">Let's Talk</h1>
           <p className="text-sm text-[#9CA3AF] leading-relaxed max-w-sm mx-auto">
-            Have questions about verification, a partnership inquiry, or just want to explore
-            partnership opportunities? We&apos;re here to help you build your on-chain portfolio.
+            Whether you are a marketer ready to work smarter, a business looking to hire better, or a partner who wants to build with us, we want to hear from you.
           </p>
         </div>
 
