@@ -214,10 +214,6 @@ export default function AboutPage() {
               ))}
             </div>
 
-            <p className="text-gray-300 text-sm mb-6 max-w-2xl mx-auto">
-              If you&apos;re building tools, running events, or growing communities where proof matters, let&apos;s talk.
-            </p>
-
             <a
               href="mailto:partnerships@ghonsiproof.com"
               className="inline-flex gap-2 bg-[#C19A4A] text-[#0B0F1B] py-3 px-6 rounded-lg font-bold cursor-pointer border-none shadow-[0_6px_18px_rgba(193,154,74,0.12)] hover:bg-[#a8853b] transition-all hover:shadow-[0_8px_24px_rgba(193,154,74,0.25)] text-base"
