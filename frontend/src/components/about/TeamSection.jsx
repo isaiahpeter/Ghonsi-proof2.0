@@ -26,6 +26,13 @@ const teamMembers = [
     website: 'https://progress-dev.vercel.app',
   },
   {
+    name: 'Victor Gunduor',
+    role: 'Frontend Engineer',
+    bio: 'Victor is a Frontend Engineer who crafts beautiful, responsive, and motion-rich interfaces using React, Tailwind CSS, TypeScript, and 3D motion. With obsessive attention to detail, he transforms complex workflows into immersive UIs users love. He is also a Web3 content creator and experienced writer.',
+    image: '/assets/team/victor.jpg',
+    website: 'https://linkedin.com/in/victor-gunduor',
+  },
+  {
     name: 'Nie Osaoboh',
     role: 'Product Designer',
     bio: 'Nie is a product designer with a background in digital marketing, focused on creating simple, user-friendly experiences. He designs products that are visually appealing and easy to use, helping bring ideas to life seamlessly.',
@@ -38,13 +45,6 @@ const teamMembers = [
     bio: 'Success aka Web3Geek, is a community builder and blockchain educator with years of experience helping top web3 brands grow strong engaged communities. He currently serves as Regional Captain for SuperteamNG North East and North West, while also supporting major projects with community strategy and growth.',
     image: '/assets/team/success.jpg',
     website: 'https://linkedin.com/in/success-ola-ojo',
-  },
-  {
-    name: 'Victor Gunduor',
-    role: 'Frontend Engineer',
-    bio: 'Victor is a Frontend Engineer who crafts beautiful, responsive, and motion-rich interfaces using React, Tailwind CSS, TypeScript, and 3D motion. With obsessive attention to detail, he transforms complex workflows into immersive UIs users love. He is also a Web3 content creator and experienced writer.',
-    image: '/assets/team/victor.jpg',
-    website: 'https://linkedin.com/in/victor-gunduor',
   },
 ];
 

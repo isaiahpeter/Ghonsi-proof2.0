@@ -22,8 +22,8 @@ const EverythingYouNeedSection = () => {
 
   return (
     <>
-      {/* Desktop: Grid view */}
-      <div className="hidden md:grid md:grid-cols-3 gap-6 md:gap-8 mb-12">
+      {/* Laptop and above: Grid view */}
+      <div className="hidden lg:grid lg:grid-cols-3 gap-6 lg:gap-8 mb-12">
         {cards.map((card) => (
           <div key={card.title} className="bg-[#151925] rounded-2xl p-8 border border-[#C19A4A]/30">
             <div className="w-12 h-12 bg-[#C19A4A] rounded-lg flex items-center justify-center mb-6">
@@ -37,8 +37,10 @@ const EverythingYouNeedSection = () => {
         ))}
       </div>
 
-      {/* Mobile: Carousel view */}
-      <MobileCarousel />
+      {/* Mobile and Tablet: Carousel view */}
+      <div className="lg:hidden">
+        <MobileCarousel />
+      </div>
     </>
   );
 };

@@ -306,7 +306,7 @@ const Reviews = () => {
       <BackgroundBlobs />
       
       <div className="relative z-10">
-        <h2 ref={titleRef} className="text-2xl md:text-3xl font-bold font-[Inter] text-center mb-4">
+        <h2 ref={titleRef} className="text-2xl md:text-4xl font-bold font-[Inter] text-center mb-4">
           What people are saying
         </h2>
 

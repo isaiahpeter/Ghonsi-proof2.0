@@ -47,7 +47,7 @@ const MiniMeChat = () => {
   }, [currentText, currentQuestionIndex, isTyping, isErasing, questions]);
 
   return (
-    <div className="bg-[#151925] rounded-2xl p-6 border border-[#C19A4A]/30 h-full flex flex-col">
+    <div className="bg-[#151925] rounded-2xl p-6 border border-[#C19A4A]/30 flex flex-col">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-[#C19A4A]/20">
         <div className="w-10 h-10 bg-gradient-to-br from-[#C19A4A] to-[#d9b563] rounded-full flex items-center justify-center flex-shrink-0">
@@ -64,52 +64,53 @@ const MiniMeChat = () => {
         </div>
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 space-y-4 overflow-hidden min-h-[120px]">
+      {/* ── FIXED-HEIGHT message container — this is the invisible stable box ── */}
+      {/* h-[80px] is tall enough for 2 wrapped lines; adjust if your longest
+          question wraps to 3 lines at your smallest breakpoint              */}
+      <div className="relative h-[80px] overflow-hidden">
         <AnimatePresence mode="wait">
-          {currentText && (
+          {currentText ? (
             <motion.div
               key="message"
-              initial={{ opacity: 0, y: 20, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex gap-3"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="absolute inset-0 flex gap-3 items-start"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-[#C19A4A] to-[#d9b563] rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-[#C19A4A] to-[#d9b563] rounded-full flex items-center justify-center flex-shrink-0 mt-1">
                 <svg className="w-5 h-5 text-[#0B0F1B]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
                 </svg>
               </div>
-              <div className="flex-1">
-                <div className="bg-[#0B0F1B] rounded-2xl rounded-tl-none px-4 py-3 border border-[#C19A4A]/20 min-h-[60px]">
-                  <p className="text-white text-sm leading-relaxed">
+              <div className="flex-1 overflow-hidden">
+                <div className="bg-[#0B0F1B] rounded-2xl rounded-tl-none px-4 py-3 border border-[#C19A4A]/20">
+                  <p className="text-white text-sm leading-relaxed break-words">
                     {currentText}
                     {isTyping && !isErasing && (
-                      <span className="inline-block w-1 h-4 bg-[#C19A4A] ml-1 animate-pulse" />
+                      <span className="inline-block w-[2px] h-[14px] bg-[#C19A4A] ml-1 align-middle animate-pulse" />
                     )}
                   </p>
                 </div>
               </div>
             </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="text-center text-gray-500">
+                <svg className="w-8 h-8 mx-auto mb-1 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+                <p className="text-xs">Initializing...</p>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Empty state when no text */}
-        {!currentText && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex items-center justify-center h-full min-h-[120px]"
-          >
-            <div className="text-center text-gray-500">
-              <svg className="w-12 h-12 mx-auto mb-3 opacity-50" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-              </svg>
-              <p className="text-sm">Initializing...</p>
-            </div>
-          </motion.div>
-        )}
       </div>
 
       {/* Footer */}
@@ -124,7 +125,5 @@ const MiniMeChat = () => {
     </div>
   );
 };
-
-
 
 export default MiniMeChat;

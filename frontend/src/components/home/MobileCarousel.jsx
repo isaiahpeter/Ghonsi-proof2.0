@@ -36,7 +36,7 @@ const MobileCarousel = () => {
   };
 
   return (
-    <div className="md:hidden mb-12">
+    <div className="mb-12">
       <div className="relative">
         {/* Card */}
         <div className="bg-[#151925] rounded-2xl p-8 border border-[#C19A4A]/30">

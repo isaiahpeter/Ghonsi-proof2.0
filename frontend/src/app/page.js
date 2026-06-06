@@ -76,7 +76,7 @@ export default function HomePage() {
       <div className="relative z-10">
 
         {/* ── HERO ── */}
-        <section className="mb-16 px-5 md:px-12 lg:px-20">
+        <section className="mb-20 px-5 md:px-12 lg:px-20">
           <div className="max-w-7xl mx-auto">
 
             {/* Mobile */}
@@ -133,9 +133,9 @@ export default function HomePage() {
         </div>
 
         {/* ── PROBLEM STATEMENT ── */}
-        <section className="mb-16 px-5 md:px-12 lg:px-20">
+        <section className="mb-20 px-5 md:px-12 lg:px-20">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <h2 className="text-2xl md:text-4xl font-bold font-[Inter] mb-4">
                 You&apos;ve spent years mastering marketing.
               </h2>
@@ -144,7 +144,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 mb-16">
+            <div className="grid md:grid-cols-2 gap-8 md:gap-12">
               {/* Marketers */}
               <div className="bg-[#151925] rounded-2xl p-8 border border-[#C19A4A]/30">
                 <h3 className="text-2xl font-bold text-[#C19A4A] mb-6">Marketers</h3>
@@ -186,11 +186,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="text-center">
-              <h3 className="text-sm font-bold text-white italic">
-                That silent frustration ends here.
-              </h3>
-            </div>
+
           </div>
         </section>
 
@@ -225,7 +221,7 @@ export default function HomePage() {
         {/* ── HIRE TALENT ── */}
         <section className="mb-20 px-5 md:px-12 lg:px-20">
           <div className="max-w-7xl mx-auto">
-            <div className="mb-1 mt-[-40px]">
+            <div className="mb-8">
               <h2 className="text-2xl md:text-4xl font-bold font-[Inter] text-center mb-4">
                 Hire Talent. Grow your knowledge base.
               </h2>
@@ -236,7 +232,7 @@ export default function HomePage() {
                 Your own AI agent learns your brand and captures insight from every output, so you
                 never start afresh with every hire
               </p>
-              <ul className="text-gray-300 text-base leading-relaxed mb-1 space-y-3 max-w-3xl mx-auto">
+              <ul className="text-gray-300 text-base leading-relaxed mb-8 space-y-3 max-w-3xl mx-auto">
                 {[
                   'Browse portfolios with timestamped results.',
                   'Your AI Agent onboards instantly on any new hire\'s knowledge base.',
@@ -252,7 +248,7 @@ export default function HomePage() {
               <CardsSection />
             </div>
 
-            <div className="flex justify-center mt-[-70px] md:mt-[-150px] mb-20">
+            <div className="flex justify-center mt-8">
               <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500 overflow-hidden w-full md:w-auto">
                 <a href="/hirers/dashboard" className="block w-full md:w-auto md:px-12 bg-[#0B0F1B] text-white py-3 rounded-xl font-semibold hover:bg-[#151925] transition-colors text-center">
                   Activate Your Team

@@ -37,7 +37,7 @@ export default function TrustedEcosystemSection({
     <section ref={ref} className="bg-[#0a0a0a] py-20 border-t border-b border-white/5 my-20">
       <div className="px-6 md:px-12 lg:px-20 max-w-2xl md:max-w-7xl mx-auto text-center">
         <div>
-          <h2 className="text-white font-bold font-[Inter] text-4xl">Trusted in the Ecosystem</h2>
+          <h2 className="text-white font-bold font-[Inter] text-2xl md:text-4xl">Trusted in the Ecosystem</h2>
           <p className="text-white/50 text-base max-w-lg mx-auto mt-3">
             We're proud to partner with communities building the next generation of Web3 talent.
           </p>

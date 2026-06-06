@@ -60,11 +60,11 @@ const WhatYouGetSection = () => {
           variants={headingVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="text-4xl md:text-3xl font-bold font-[Inter] text-white text-center mb-4"
+          className="text-2xl md:text-4xl font-bold font-[Inter] text-white text-center mb-4"
         >
-          What You Get –{' '}
+          Start Free.{' '}
           <span className="bg-gradient-to-r from-gray-400 to-[#C19A4A] bg-clip-text text-transparent">
-            Free for Now
+            Work Smarter.
           </span>
         </motion.h2>
 
@@ -75,7 +75,7 @@ const WhatYouGetSection = () => {
           animate={isInView ? 'visible' : 'hidden'}
           className="text-gray-400 text-center text-base mb-16 max-w-3xl mx-auto"
         >
-          Everything you need to prove your work or find real talent — available at no cost today.
+          Marketing intelligence for professionals. Verified talent for businesses.
         </motion.p>
 
         {/* Two-column layout */}
@@ -105,7 +105,7 @@ const WhatYouGetSection = () => {
               ))}
             </ul>
             <div className="border-t border-white/10 pt-6">
-              <p className="text-white font-semibold mb-2">Pay only when you need more</p>
+              <p className="text-white font-semibold mb-2">Pay when you need more</p>
               <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.15 per extra credit</p>
               <p className="text-gray-400 text-xs">Instant top-up • No subscription required</p>
             </div>
@@ -166,11 +166,11 @@ const WhatYouGetSection = () => {
           variants={headingVariants}
           initial="hidden"
           animate={isInView ? 'visible' : 'hidden'}
-          className="text-5xl font-bold font-[Inter] text-white text-center mb-4"
+          className="text-2xl md:text-4xl font-bold font-[Inter] text-white text-center mb-4"
         >
-          What You Get –{' '}
+          Start Free.{' '}
           <span className="bg-gradient-to-r from-gray-400 to-[#C19A4A] bg-clip-text text-transparent">
-            Free for Now
+            Work Smarter.
           </span>
         </motion.h2>
 
@@ -181,7 +181,7 @@ const WhatYouGetSection = () => {
           animate={isInView ? 'visible' : 'hidden'}
           className="text-gray-400 text-center text-lg mb-16 max-w-3xl mx-auto"
         >
-          Everything you need to prove your work or find real talent — available at no cost today.
+          Marketing intelligence for professionals. Verified talent for businesses.
         </motion.p>
 
         {/* Two-column layout */}
@@ -211,7 +211,7 @@ const WhatYouGetSection = () => {
               ))}
             </ul>
             <div className="border-t border-white/10 pt-6">
-              <p className="text-white font-semibold mb-2">Pay only when you need more</p>
+              <p className="text-white font-semibold mb-2">Pay when you need more</p>
               <p className="text-[#C19A4A] text-lg font-bold mb-1">$0.15 per extra credit</p>
               <p className="text-gray-400 text-xs">Instant top-up • No subscription required</p>
             </div>

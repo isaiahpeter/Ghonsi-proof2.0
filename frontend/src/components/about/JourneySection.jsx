@@ -114,44 +114,6 @@ export default function JourneySection() {
           </motion.div>
         ))}
       </motion.div>
-
-      {/* Closing paragraph */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.6, ease: 'easeOut', delay: 1.0 }}
-      >
-        <p className="text-white/80 mb-8">
-          We&apos;re still early, but our focus is clear: make proof of work visible, verifiable, and
-          scalable — forever.
-          <br />
-          Ready to showcase your work and unlock your team&apos;s full potential?
-        </p>
-      </motion.div>
-
-      {/* CTA Buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.6, ease: 'easeOut', delay: 1.2 }}
-        className="flex flex-col md:flex-row gap-3 mb-20"
-      >
-        <button
-          onClick={() => router.push('/login')}
-          className="w-full bg-[#C19A4A] text-[#0B0F1B] py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-[#d4af37] transition-colors"
-        >
-          Create My Portfolio
-          <ArrowRight size={20} />
-        </button>
-        <button
-          onClick={() => router.push('/professionals/mini-them')}
-          className="w-full bg-transparent border-2 border-white text-white py-3 rounded-xl font-semibold hover:bg-white/10 transition-colors"
-        >
-          Launch My Mini-Me
-        </button>
-      </motion.div>
     </section>
   );
 }

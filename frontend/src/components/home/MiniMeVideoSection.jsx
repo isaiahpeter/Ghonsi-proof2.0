@@ -7,7 +7,7 @@ export default function MiniMeVideoSection() {
     <>
       {/* Mobile */}
       <div className="md:hidden">
-        <h2 className="text-2xl font-bold font-[Inter] text-center mb-4">
+        <h2 className="text-2xl md:text-4xl font-bold font-[Inter] text-center mb-4">
           Meet Mini Me — Your Personal Marketing Expert
         </h2>
         <p className="text-gray-300 text-center text-base mb-4">
@@ -46,7 +46,7 @@ export default function MiniMeVideoSection() {
       {/* Desktop */}
       <div className="hidden md:grid md:grid-cols-2 md:gap-12 md:items-center">
         <div className="text-left">
-          <h2 className="text-3xl lg:text-4xl font-bold font-[Inter] mb-6">
+          <h2 className="text-2xl md:text-4xl font-bold font-[Inter] mb-6">
             Meet Mini Me — Your Personal Marketing Expert
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed mb-8">

@@ -2,11 +2,12 @@
 // SERVER COMPONENT (SSR)
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { ArrowRight, Rocket, Trophy, Briefcase, Building2 } from 'lucide-react';
+import { ArrowRight, GraduationCap, Users, Building2, Blocks } from 'lucide-react';
 import ValuesCarousel from '@/components/about/ValuesCarousel';
 import TeamSection from '@/components/about/TeamSection';
 import JourneySection from '@/components/about/JourneySection';
 import DiscoverabilityButton from '@/components/about/DiscoverabilityButton';
+import OurStorySection from '@/components/about/OurStorySection';
 
 export const metadata = {
   title: 'About',
@@ -135,54 +136,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── OUR STORY ── */}
-        <section className="p-4 max-w-6xl mx-auto mt-20 mb-20 relative z-10">
-          <h2 className="text-white text-3xl md:text-4xl font-bold font-[Inter] text-center mb-12">
-            Our Story
-          </h2>
-
-          {/* Desktop */}
-          <div className="hidden md:flex gap-8 items-start">
-            <div className="flex-shrink-0 w-[45%]">
-              <div className="relative p-[3px] rounded-2xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500">
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 flex items-center justify-center min-h-[400px]">
-                  <img
-                    src="/assets/ghonsi-proof-logos/transparent-png-logo/Get-noticed.PNG"
-                    alt="Ghonsi proof platform diagram"
-                    className="max-w-full h-auto"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex-1 text-white/80 text-base leading-relaxed space-y-4">
-              <p>It started with a clear problem: In Web3, genuine builders struggle to prove their value. Portfolios are scattered, claims are hard to verify, and recruiters waste time sorting truth from hype.</p>
-              <p>We began as proofHub — a simple tool to help professionals document their work as it happens. Then we rebuilt everything on Solana to create a tamper-proof professional identity layer.</p>
-              <p>Today, that foundation has grown into something bigger. We saw that the same pain — lost credit and disappearing expertise — exists far beyond Web3. So we evolved Ghonsi proof into a workforce intelligence platform. We built Mini Me, a personal AI agent grounded in deep Nigerian market research, to help professionals execute work and grow their expertise. It also supports founders who struggle to understand the Nigerian market and international companies looking to enter it successfully. We added a knowledge retention layer so hirers don&apos;t lose the expertise they paid for after every engagement, while the permanent on-chain proof layer remains the foundation of trust.</p>
-              <p>What began as a way to give builders lasting credit has become infrastructure that captures professional knowledge, proves real work, and makes both talent and hirers smarter with every engagement.</p>
-            </div>
-          </div>
-
-          {/* Mobile */}
-          <div className="md:hidden space-y-8">
-            <div className="text-white/80 text-base leading-relaxed space-y-4">
-              <p>It started with a clear problem: In Web3, genuine builders struggle to prove their value. Portfolios are scattered, claims are hard to verify, and recruiters waste time sorting truth from hype.</p>
-              <p>We began as proofHub — a simple tool to help professionals document their work as it happens. Then we rebuilt everything on Solana to create a tamper-proof professional identity layer.</p>
-              <p>Today, that foundation has grown into something bigger. We saw that the same pain — lost credit and disappearing expertise — exists far beyond Web3. So we evolved Ghonsi proof into a workforce intelligence platform. We built Mini Me, a personal AI agent grounded in deep Nigerian market research, to help professionals execute work and grow their expertise. It also supports founders who struggle to understand the Nigerian market and international companies looking to enter it successfully. We added a knowledge retention layer so hirers don&apos;t lose the expertise they paid for after every engagement, while the permanent on-chain proof layer remains the foundation of trust.</p>
-              <p>What began as a way to give builders lasting credit has become infrastructure that captures professional knowledge, proves real work, and makes both talent and hirers smarter with every engagement.</p>
-            </div>
-            <div className="w-full">
-              <div className="relative p-[3px] rounded-2xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500">
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 flex items-center justify-center min-h-[300px]">
-                  <img
-                    src="/assets/ghonsi-proof-logos/transparent-png-logo/Get-noticed.PNG"
-                    alt="Ghonsi proof platform diagram"
-                    className="max-w-full h-auto"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <OurStorySection />
 
         {/* ── DISCOVERABILITY ── */}
         <section className="p-4 max-w-6xl mx-auto mt-20 mb-20 relative z-10">
@@ -234,17 +188,17 @@ export default function AboutPage() {
               Partner with us to embed verifiable proof of work directly into your ecosystem.
             </p>
             <p className="text-gray-400 text-sm leading-relaxed mb-12 max-w-3xl mx-auto">
-              At Ghonsi Proof, we&apos;re building the on-chain infrastructure that makes every contribution tamper-proof and instantly verifiable. When you integrate with us, your projects, talent pools, and communities gain permanent, trustless records of real impact.
+              We work with partners to bring expert marketing intelligence and timestamped proof of work into their ecosystems.
             </p>
 
             <p className="text-white text-base mb-6 font-semibold">We collaborate with:</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
               {[
-                { icon: <Rocket size={24} />, title: 'Web3 Projects & Protocols', desc: 'Showcase genuine builder contributions' },
-                { icon: <Trophy size={24} />, title: 'Hackathon Organizers', desc: 'Issue verifiable participation and win proofs' },
-                { icon: <Briefcase size={24} />, title: 'Talent Platforms & Hiring Marketplaces', desc: 'Add reliable reputation layers' },
-                { icon: <Building2 size={24} />, title: 'DAOs, Communities & Ecosystems', desc: 'Build transparency and accountability' },
+                { icon: <GraduationCap size={24} />, title: 'Academies and Training Institutions', desc: 'Issue verifiable certificates to student portfolios via API. Graduates leave with on-chain proof of skills and an AI companion trained on real market knowledge.' },
+                { icon: <Users size={24} />, title: 'Talent Platforms and Hiring Marketplaces', desc: 'Add tamper-proof work records and research-backed marketing intelligence to your users.' },
+                { icon: <Building2 size={24} />, title: 'Businesses and Marketing Teams', desc: 'Access domain AI trained on the Nigerian market. Brief smarter and evaluate better.' },
+                { icon: <Blocks size={24} />, title: 'Web3 Projects and Communities', desc: 'Permanent proof of contribution plus AI tools that help members perform better. Verified records of what was built and the intelligence to do it again.' },
               ].map((card) => (
                 <div key={card.title} className="relative p-[2px] rounded-2xl bg-gradient-to-br from-[#C19A4A]/30 to-white/10">
                   <div className="bg-[#0B0F1B]/80 backdrop-blur-xl rounded-2xl p-6 border border-white/10 text-left h-full">
