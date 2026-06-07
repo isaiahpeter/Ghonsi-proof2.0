@@ -8,7 +8,6 @@ const { sendEmail } = require('./brevoEmail');
 const { solanaPaymentMiddleware, createSolanaPaymentMiddleware } = require('./src/middleware/solanaPaymentMiddleware');
 const swaggerUi = require('swagger-ui-express');
 const { swaggerSpec } = require('./src/config/swagger');
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -34,9 +33,30 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+// ───────────────────────
+// Market data (crawlers) API under /api/v1
+// ───────────────────────
+const { router: marketRouter, setSupabaseClient } = require('./src/routes/market');
+setSupabaseClient(supabase);
+app.use('/api/v1', marketRouter);
+
+// Start the Ghonsi scheduler (ESM dynamic import)
+(async () => {
+  try {
+    const { startScheduler } = await import('./ghonsi-data-intelligence/src/scheduler/index.js');
+    startScheduler();
+    console.log('Ghonsi scheduler started.');
+  } catch (err) {
+    console.error('Failed to start scheduler:', err);
+  }
+})();
+
+
+
 /**
  * @swagger
  * /health:
+
  *   get:
  *     tags: [Health]
  *     summary: Health check
