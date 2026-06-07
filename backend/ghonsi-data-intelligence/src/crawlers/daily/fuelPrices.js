@@ -1,52 +1,34 @@
 
-/**
- * fuelPrices.js
- * --------------
- * Scrapes the NNPCL homepage for pump price indications.
- * If the price isn't found, it returns null.
- */
-
-import * as cheerio from 'cheerio';
-
-const SOURCE_URL = 'https://nnpcgroup.com';
+import { chromium } from 'playwright';
 
 export async function fetchFuelPrices() {
-  const fetchedAt = new Date();
-  const res = await fetch(SOURCE_URL, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-    }
+  const browser = await chromium.launch({ headless: true, args: ['--no-sandbox'] });
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    locale: 'en-US',
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  const html = await res.text();
-  const $ = cheerio.load(html);
+  const page = await context.newPage();
 
-  // Look for any element containing both "₦" or "N" and "litre" or "per litre"
-  let priceText = '';
-  $('*:contains("₦"), *:contains("N")').each((i, el) => {
-    const t = $(el).text();
-    if (t.match(/litre|pump price|petrol|PMS/i)) {
-      priceText = t;
-      return false;
-    }
-  });
+  try {
+    await page.goto('https://nnpcgroup.com', { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(2000);
 
-  if (!priceText) {
-    // Fallback: look for any large number near the word "price"
-    const bodyText = $('body').text();
-    const match = bodyText.match(/(?:₦|N)\s*([\d,]+\.?\d*)/);
-    if (match) priceText = match[0];
+    const bodyText = await page.textContent('body');
+    const match = bodyText.match(/(?:₦|N)\s*([\d,]+\.?\d*)\s*(?:per\s*litre|\/L|litre)?/i);
+    const price = match ? parseFloat(match[1].replace(/,/g, '')) : null;
+
+    return {
+      source: 'NNPCL',
+      sourceUrl: 'https://nnpcgroup.com',
+      fetchedAt: new Date().toISOString(),
+      freshness: price ? 'today' : 'unavailable',
+      price,
+      currency: 'NGN',
+    };
+  } finally {
+    await context.close();
+    await browser.close();
   }
-
-  const priceMatch = priceText.match(/(?:₦|N)\s*([\d,]+\.?\d*)/);
-  const price = priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : null;
-
-  return {
-    source: 'NNPCL',
-    sourceUrl: SOURCE_URL,
-    fetchedAt: fetchedAt.toISOString(),
-    freshness: price ? 'today' : 'unavailable',
-    price,
-    currency: 'NGN',
-  };
 }
+

@@ -877,4 +877,72 @@ router.get('/health', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// NBS REPORTS
+// ═══════════════════════════════════════════════════════════════════
+
+/**
+ * @swagger
+ * /api/v1/nbs:
+ *   get:
+ *     tags: [Market Data]
+ *     summary: Get latest NBS reports
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         schema: { type: integer }
+ *         description: Max reports to return
+ *     responses:
+ *       200:
+ *         description: List of NBS reports
+ */
+router.get('/nbs', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const { data, error } = await supabase
+      .from('nbs_reports')
+      .select('*')
+      .order('report_id', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/v1/nbs/run:
+ *   post:
+ *     tags: [Market Data]
+ *     summary: Trigger NBS reports crawl
+ *     responses:
+ *       200:
+ *         description: Crawl result
+ */
+router.post('/nbs/run', async (req, res) => {
+  try {
+    const { fetchNBSReports } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/nbsReports.js');
+    const result = await fetchNBSReports({ limit: 10 });
+    const rows = result.reports.map(r => ({
+      report_id: r.id,
+      title: r.title,
+      url: r.url,
+      download_url: r.downloadUrl,
+      published_at: r.publishedAt,
+      raw_data: r,
+    }));
+    const { error } = await supabase
+      .from('nbs_reports')
+      .upsert(rows, { onConflict: 'report_id' });
+    if (error) throw error;
+    await logCrawl('nbsReports', 'success', rows.length);
+    res.json({ success: true, inserted: rows.length });
+  } catch (err) {
+    await logCrawl('nbsReports', 'failed', 0, err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 module.exports = { router, setSupabaseClient };
