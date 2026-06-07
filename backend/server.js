@@ -252,7 +252,7 @@ const deriveProgramAuthorityPda = (programId) => {
  *       500:
  *         description: Server error
  */
-app.post('/api/prepare-mint', createSolanaPaymentMiddleware({ amount: '200000', description: 'Proof upload — $0.20 USDT' }), async (req, res) => {
+app.post("/api/prepare-mint", async (req, res) => {
   try {
     // LOG EVERYTHING WE RECEIVE
     console.log('═══════════════════════════════════════');
@@ -307,7 +307,7 @@ app.post('/api/prepare-mint', createSolanaPaymentMiddleware({ amount: '200000', 
     const programAuthorityPda = deriveProgramAuthorityPda(programId);
 
     const tx = await program.methods
-      .submitProof(proofId, title, ipfsUri, proofType)
+      .submitProof(proofId, ipfsUri)
       .accounts({
         owner: ownerPublicKey,
         proof: proofPda,
@@ -319,7 +319,7 @@ app.post('/api/prepare-mint', createSolanaPaymentMiddleware({ amount: '200000', 
 
     const { blockhash } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;
-    tx.feePayer = adminKeypair.publicKey; // admin pays rent — owner just co-signs
+    tx.feePayer = ownerPublicKey; // owner pays rent (payer-is-signer)
     tx.partialSign(adminKeypair);
 
     const serialized = tx.serialize({ requireAllSignatures: false });
@@ -409,7 +409,7 @@ app.post('/api/submit-proof', async (req, res) => {
 
     // 4 args — description stays off-chain in Supabase
     const tx = await program.methods
-      .submitProof(proofId, title, ipfsUri, proofType)
+      .submitProof(proofId, ipfsUri)
       .accounts({
         owner: ownerPublicKey,
         proof: proofPda,
@@ -529,7 +529,7 @@ app.post('/api/migrate-to-mainnet', async (req, res) => {
 
         // 4 args — description stays off-chain in Supabase
         const tx = await program.methods
-          .submitProof(proofId, title, ipfsUri, proofType)
+          .submitProof(proofId, ipfsUri)
           .accounts({
             owner: ownerPublicKey,
             proof: proofPda,
