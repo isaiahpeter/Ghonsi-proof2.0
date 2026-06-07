@@ -76,63 +76,33 @@ async function findLatestCPIReport() {
 
 function parseCPIText(text) {
   const indicators = [];
+  // All Items Index – match the first float after the heading
+  const headlineMatch = text.match(/All\s+Items\s+Index\s*[\s\S]*?(\d+\.?\d{1,2})\s*%?/i);
+  if (headlineMatch) indicators.push({ indicator_name: 'Headline CPI', value: parseFloat(headlineMatch[1]), unit: '%' });
 
-  const headlineMatch = text.match(/All\s+Items\s+Index\s*[\s\S]{0,200}?(\d+\.?\d*)%?/i);
-  if (headlineMatch) {
-    indicators.push({
-      indicator_name: 'Headline CPI',
-      value: parseFloat(headlineMatch[1]),
-      unit: '%',
-    });
-  }
+  const foodMatch = text.match(/Food\s+Index\s*[\s\S]*?(\d+\.?\d{1,2})\s*%?/i);
+  if (foodMatch) indicators.push({ indicator_name: 'Food Inflation', value: parseFloat(foodMatch[1]), unit: '%' });
 
-  const foodMatch = text.match(/Food\s+Index\s*[\s\S]{0,200}?(\d+\.?\d*)%?/i);
-  if (foodMatch) {
-    indicators.push({
-      indicator_name: 'Food Inflation',
-      value: parseFloat(foodMatch[1]),
-      unit: '%',
-    });
-  }
+  const coreMatch = text.match(/All\s+Items\s+Less\s+Farm\s+Produce\s*[\s\S]*?(\d+\.?\d{1,2})\s*%?/i);
+  if (coreMatch) indicators.push({ indicator_name: 'Core Inflation', value: parseFloat(coreMatch[1]), unit: '%' });
 
-  const coreMatch = text.match(/All\s+Items\s+Less\s+Farm\s+Produce\s*[\s\S]{0,200}?(\d+\.?\d*)%?/i);
-  if (coreMatch) {
-    indicators.push({
-      indicator_name: 'Core Inflation',
-      value: parseFloat(coreMatch[1]),
-      unit: '%',
-    });
-  }
+  const urbanMatch = text.match(/Urban\s+Inflation\s*[\s\S]*?(\d+\.?\d{1,2})\s*%?/i);
+  if (urbanMatch) indicators.push({ indicator_name: 'Urban Inflation', value: parseFloat(urbanMatch[1]), unit: '%' });
 
-  const urbanMatch = text.match(/Urban\s+Inflation\s*[\s\S]{0,200}?(\d+\.?\d*)%?/i);
-  if (urbanMatch) {
-    indicators.push({
-      indicator_name: 'Urban Inflation',
-      value: parseFloat(urbanMatch[1]),
-      unit: '%',
-    });
-  }
-  const ruralMatch = text.match(/Rural\s+Inflation\s*[\s\S]{0,200}?(\d+\.?\d*)%?/i);
-  if (ruralMatch) {
-    indicators.push({
-      indicator_name: 'Rural Inflation',
-      value: parseFloat(ruralMatch[1]),
-      unit: '%',
-    });
-  }
+  const ruralMatch = text.match(/Rural\s+Inflation\s*[\s\S]*?(\d+\.?\d{1,2})\s*%?/i);
+  if (ruralMatch) indicators.push({ indicator_name: 'Rural Inflation', value: parseFloat(ruralMatch[1]), unit: '%' });
 
   let reportMonth = null;
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const monthMatch = text.match(new RegExp(`(${monthNames.join('|')})\\s+(\\d{4})`, 'i'));
   if (monthMatch) {
     const idx = monthNames.findIndex(m => m.toLowerCase() === monthMatch[1].toLowerCase());
-    if (idx >= 0) {
-      reportMonth = `${monthMatch[2]}-${String(idx + 1).padStart(2, '0')}-01`;
-    }
+    if (idx >= 0) reportMonth = `${monthMatch[2]}-${String(idx + 1).padStart(2, '0')}-01`;
   }
 
   return { indicators, reportMonth, rawText: text.substring(0, 800) };
 }
+
 
 export async function fetchCPIReport() {
   try {
