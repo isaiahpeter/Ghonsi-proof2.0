@@ -1,0 +1,6 @@
+- [ ] TASK 4: Convert fuel price to Playwright
+  - [x] Updated fuelPrices.js to use Playwright instead of Cheerio
+  - [x] Add `playwright` dependency to package.json
+  - [ ] Install dependencies (npm i) in backend/ghonsi-data-intelligence
+  - [ ] Test via POST http://localhost:3001/api/v1/fuel/run
+  - [ ] If NNPCL still returns null, implement fallback source (e.g., pumpsprice.com.ng)
