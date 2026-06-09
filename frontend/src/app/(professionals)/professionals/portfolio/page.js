@@ -66,7 +66,19 @@ function processProofsIntoSkills(proofs) {
     // ── A) skills_and_expertise (new structured format) ──
     const sae = ed.skills_and_expertise;
     if (Array.isArray(sae) && sae.length > 0) {
-      sae.forEach(skillObj => {
+      sae.forEach(rawSkill => {
+        // Normalize strings into objects using the proof-level confidence as fallback
+        const skillObj = typeof rawSkill === 'string'
+          ? {
+              name: rawSkill,
+              confidence: typeof ed.confidence?.skills_and_expertise === 'number'
+                ? ed.confidence.skills_and_expertise
+                : 0.75,
+              category: ed.program_category || 'General',
+              proficiency: 'mentioned'
+            }
+          : rawSkill;
+
         // Validate it's an object with name property
         if (!skillObj || typeof skillObj !== 'object' || !skillObj.name) return;
         
