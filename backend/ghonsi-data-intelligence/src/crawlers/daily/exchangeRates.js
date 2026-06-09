@@ -71,16 +71,26 @@ function extractLatestRates(records, currencies) {
 
     const code = CURRENCY_CODE_MAP[name] ?? name;
 
+    const buyingRate = parseRate(record.buyingrate);
+    const centralRate = parseRate(record.centralrate); // official rate
+    const sellingRate = parseRate(record.sellingrate);
+
     rates[code] = {
       currency: code,
       currencyName: name,
       pair: `${code}/NGN`,
       date: record.ratedate,
-      buyingRate:  parseRate(record.buyingrate),
-      centralRate: parseRate(record.centralrate), // official rate
-      sellingRate: parseRate(record.sellingrate),
+      buyingRate,
+      centralRate,
+      sellingRate,
       source: "CBN",
       sourceUrl: CBN_API_URL,
+      extracted_content: `${code}/NGN official rate: buying ₦${buyingRate}, central ₦${centralRate}, selling ₦${sellingRate} as at ${record.ratedate}.`,
+      key_values: JSON.stringify({
+        [`${code}_buying`]: buyingRate,
+        [`${code}_central`]: centralRate,
+        [`${code}_selling`]: sellingRate
+      }),
     };
   }
 

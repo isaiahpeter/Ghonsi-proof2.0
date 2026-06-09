@@ -1,6 +1,6 @@
-# TODO
-- [ ] Inspect CPI monthly crawler and locate parseCPIText implementation.
-- [ ] Prepare edit plan for CPI headline regex fix.
-- [ ] After approval, update parseCPIText function in `backend/ghonsi-data-intelligence/src/crawlers/monthly/cpiReports.js` using provided version.
-- [ ] Run endpoint curl command to verify Headline CPI around ~17.33.
+# TODO - Ghonsi-proof2.0
+
+- [x] Fix one-time news key_values.source='unknown' backfill using provided Supabase SQL.
+- [x] Standardize daily scheduler job invocation in `backend/ghonsi-data-intelligence/src/scheduler/index.js` so `runAndLog` always receives a function that is called.
+- [ ] Restart backend and verify scheduler logs show daily jobs running.
 

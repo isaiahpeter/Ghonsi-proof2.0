@@ -129,14 +129,25 @@ function extractTrends(parsed, { geo, limit, fetchedAt }) {
       imageUrl: safeText(n["ht:news_item_picture"]) ?? null,
     }));
 
+    const query = safeText(item.title) ?? "Unknown";
+    const trafficVolume = safeText(item["ht:approx_traffic"]) ?? "N/A";
+
     return {
       rank: index + 1,
-      query: safeText(item.title) ?? "Unknown",
-      trafficVolume: safeText(item["ht:approx_traffic"]) ?? "N/A",
+      query,
+      trafficVolume,
       pubDate: item.pubDate ?? null,
       imageUrl: safeText(item["ht:picture"]) ?? null,
       imageSource: safeText(item["ht:picture_source"]) ?? null,
       articles,
+      extracted_content: `Trending #${index + 1}: "${query}" — ${trafficVolume} searches.`,
+      related_queries: null,
+      key_values: JSON.stringify({
+        query,
+        traffic_volume: trafficVolume,
+        articles_count: articles.length,
+        related_queries: [],
+      }),
     };
   });
 
