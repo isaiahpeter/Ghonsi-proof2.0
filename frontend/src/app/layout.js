@@ -1,7 +1,7 @@
 import './globals.css';
 import '@solana/wallet-adapter-react-ui/styles.css';
 import Providers from '@/components/layout/Providers';
-import Navbar from '@/components/layout/Navbar';
+import NavbarWrapper from '@/components/layout/NavbarWrapper';
 import FooterWrapper from '@/components/layout/FooterWrapper';
 
 export const metadata = {
@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className="min-h-screen bg-[#0B0F1B] font-sans antialiased">
         <Providers>
-          <Navbar />
+          <NavbarWrapper />
           <main>{children}</main>
           <FooterWrapper />
         </Providers>
