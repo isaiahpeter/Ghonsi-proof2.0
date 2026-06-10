@@ -12,6 +12,14 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
+app.use('/api/v1', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 app.use(express.json());
 
 // ───────────────────────
@@ -22,7 +30,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
 }));
 app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
-
 const fs = require('fs').promises;
 const path = require('path');
 const JOBS_FILE = path.join(__dirname, 'jobs.json');
