@@ -1,242 +1,207 @@
+
 /**
- * selfHealingScraper.js
- * ---------------------
- * Adaptive scraping system (stable version):
- * RSS → HTML → Playwright fallback
+ * consumerSentiment.js
+ * --------------------
+ * Scrapes Nairaland's top threads (business, adverts, phones) using Playwright.
+ * Threads are kept in Nairaland's natural order (most recent first).
+ * No re-sorting by reply count — that was pulling old high-engagement threads
+ * to the top instead of fresh 2026 content.
  */
 
-import Parser from "rss-parser";
-import * as cheerio from "cheerio";
-import { chromium } from "playwright";
+import { chromium } from 'playwright';
 
-/* ------------------ CONFIG ------------------ */
+// --- CONFIGURATION ---
+const CONFIG = {
+  baseUrl: 'https://www.nairaland.com',
+  sections: ['business', 'adverts', 'phones'],
+  threadsPerSection: 50,
+  pagesToScrape: 2, // page 1 = /business (today), page 2 = /business/1 (yesterday-ish)
+};
 
-const SOURCES = [
-  {
-    name: "NAFDAC",
-    url: "https://nafdac.gov.ng/news-and-media",
-    rss: "https://nafdac.gov.ng/feed/",
-    selectors: {
-      items: "article, .post, .news-item, .entry",
-      title: "h2 a, h3 a, .entry-title a",
-    },
-  },
-  {
-    name: "FCCPC",
-    url: "https://fccpc.gov.ng/resources-library/publications/",
-    rss: null,
-    selectors: {
-      items: ".publication, article, .post",
-      title: "h2 a, h3 a, .title a",
-    },
-  },
+const BRANDS = [
+  'MTN', 'GLO', 'AIRTEL', '9MOBILE', 'DANGOTE', 'COCA-COLA', 'PEPSI', 'NESTLÉ',
+  'INDOMIE', 'ZENITH', 'GTBANK', 'FIRST BANK', 'UBA', 'ACCESS BANK', 'PAYSTACK',
+  'FLUTTERWAVE', 'OPAY', 'PALMPAY', 'PIGGYVEST', 'JUMIA', 'KONGA', 'SLOT', 'SPAR',
+  'SHOPRITE', 'MOBOFREE', 'TOYOTA', 'HONDA', 'SAMSUNG', 'TECNO', 'INFINIX',
+  'NNPC', 'BET9JA', 'SPORTYBET', 'NOVUS', 'LAGOS', 'ABUJA', 'PORT HARCOURT'
 ];
 
-const parser = new Parser();
-function normalize({ source, method, items, error }) {
-  return {
-    source,
-    method,
-    success: Array.isArray(items) && items.length > 0,
-    items: Array.isArray(items) ? items : [],  // 🔥 CRITICAL FIX
-    error: error || null,
-  };
-}
+const POSITIVE_WORDS = [
+  'good', 'great', 'best', 'excellent', 'recommend', 'legit',
+  'quality', 'fast', 'amazing', 'nice', 'original', 'genuine'
+];
 
-function isValid(result) {
-  if (!result?.items) return false;
+const NEGATIVE_WORDS = [
+  'bad', 'scam', 'fake', 'avoid', 'poor', 'terrible', 'fraud',
+  'useless', 'waste', 'slow', 'disappointed', 'failed'
+];
 
-  const good = result.items.filter(
-    i => i.title && i.title.length > 5
-  );
+// --- HELPER FUNCTIONS ---
 
-  return good.length >= 5;
-}
-
-function dedupe(items) {
-  const map = new Map();
-  for (const i of items) map.set(i.url, i);
-  return [...map.values()];
-}
-
-/* ------------------ 1. RSS ------------------ */
-
-async function tryRSS(source) {
-  if (!source.rss) throw new Error("No RSS");
-
-  const feed = await parser.parseURL(source.rss);
-
-  const items = feed.items.map(i => ({
-    title: i.title,
-    url: i.link,
-    publishedAt: i.pubDate,
-  }));
-
-  return normalize({
-    source: source.name,
-    method: "rss",
-    items,
-  });
-}
-
-/* ------------------ 2. HTML (Cheerio) ------------------ */
-
-async function tryHTML(source) {
-  const res = await fetch(source.url, {
-    headers: {
-      "User-Agent": "Mozilla/5.0",
-    },
-  });
-
-  const html = await res.text();
-  const $ = cheerio.load(html);
-
-  const items = [];
-
-  $(source.selectors.items).each((_, el) => {
-    const a = $(el)
-      .find(source.selectors.title)
-      .first();
-
-    const title = a.text().trim();
-    const href = a.attr("href");
-
-    if (!title || !href) return;
-
-    items.push({
-      title,
-      url: new URL(href, source.url).href,
-    });
-  });
-
-  return normalize({
-    source: source.name,
-    method: "html",
-    items,
-  });
-}
-
-/* ------------------ 3. PLAYWRIGHT (fallback) ------------------ */
-
-async function tryPlaywright(source) {
-  const browser = await chromium.launch({
-    headless: true,
-  });
-
-  try {
-    const page = await browser.newPage();
-
-    await page.goto(source.url, {
-      waitUntil: "domcontentloaded",
-    });
-
-    await page.waitForSelector("a", {
-      timeout: 15000,
-    });
-
-    const items = await page.evaluate(() => {
-      return Array.from(
-        document.querySelectorAll("a[href]")
-      )
-        .map(a => ({
-          title: a.textContent.trim(),
-          url: a.href,
-        }))
-        .filter(i => i.title.length > 6);
-    });
-
-    return normalize({
-      source: source.name,
-      method: "playwright",
-      items,
-    });
-  } finally {
-    await browser.close();
+function extractBrands(title) {
+  const extracted = [];
+  for (const brand of BRANDS) {
+    const regex = new RegExp(`\\b${brand}\\b`, 'i');
+    if (regex.test(title)) extracted.push(brand);
   }
+  return extracted;
 }
 
-/* ------------------ ORCHESTRATOR ------------------ */
+function getSentiment(title) {
+  const posRegex = new RegExp(`\\b(${POSITIVE_WORDS.join('|')})\\b`, 'i');
+  const negRegex = new RegExp(`\\b(${NEGATIVE_WORDS.join('|')})\\b`, 'i');
+  const hasPos = posRegex.test(title);
+  const hasNeg = negRegex.test(title);
+  if (hasPos && !hasNeg) return 'positive';
+  if (hasNeg && !hasPos) return 'negative';
+  return 'neutral';
+}
 
-async function scrapeSource(source) {
-  const pipeline = [
-    tryRSS,
-    tryHTML,
-    tryPlaywright,
-  ];
+/**
+ * Nairaland URL scheme:
+ *   Page 1 (newest) → /business
+ *   Page 2          → /business/1
+ *   Page 3          → /business/2
+ * Lower numbers = more recent activity.
+ */
+function buildNairalandUrl(section, pageNumber) {
+  if (pageNumber === 1) return `${CONFIG.baseUrl}/${section}`;
+  return `${CONFIG.baseUrl}/${section}/${pageNumber - 1}`;
+}
 
-  let last = null;
+// --- CORE SCRAPER LOGIC ---
 
-  for (const fn of pipeline) {
+async function fetchSection(context, section) {
+  const threads = [];
+  const seenUrls = new Set();
+
+  for (let page = 1; page <= CONFIG.pagesToScrape; page++) {
+    const url = buildNairalandUrl(section, page);
+    console.log(`[nairaland] Loading ${url}`);
+
+    const pageInstance = await context.newPage();
+
+    await pageInstance.addInitScript(() => {
+      Object.defineProperty(navigator, 'webdriver', { get: () => false });
+      window.chrome = { runtime: {} };
+    });
+
     try {
-      const result = await fn(source);
+      await pageInstance.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-      if (isValid(result)) {
-        return result;
+      const newThreads = await pageInstance.$$eval('a[href]', (anchors) => {
+        const threadHrefRe = /^\/\d+\/[a-z0-9-]+/i;
+
+        return anchors
+          .filter(a => threadHrefRe.test(a.getAttribute('href') || ''))
+          .map(a => {
+            const href = a.getAttribute('href');
+            const title = a.textContent.trim();
+
+            const row = a.closest('tr');
+            let replyCount = 0;
+            let lastActivity = null;
+
+            if (row) {
+              const cells = Array.from(row.querySelectorAll('td'));
+              for (const cell of cells) {
+                const raw = cell.textContent.replace(/,/g, '').trim();
+
+                // Reply/view count: "1234/56789"
+                const countMatch = raw.match(/^(\d+)\s*\/\s*\d+$/);
+                if (countMatch) {
+                  replyCount = parseInt(countMatch[1], 10);
+                }
+
+                // Last activity timestamp: Nairaland renders relative times like
+                // "Jun 7" / "Jun 7, 2025" / "11:34am" in the last cell
+                if (/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/.test(raw)) {
+                  lastActivity = raw;
+                }
+              }
+            }
+
+            return { href, title, replyCount, lastActivity };
+          })
+          .filter(t => t.title && t.title.length > 5);
+      });
+
+      for (const t of newThreads) {
+        if (/^(business|adverts|phones|nairaland|forum|search)$/i.test(t.title)) continue;
+
+        const fullUrl = t.href.startsWith('http')
+          ? t.href
+          : `${CONFIG.baseUrl}${t.href}`;
+
+        if (!seenUrls.has(fullUrl)) {
+          seenUrls.add(fullUrl);
+          threads.push({
+            title: t.title,
+            url: fullUrl,
+            replyCount: t.replyCount,
+            lastActivity: t.lastActivity,
+            section,
+          });
+        }
       }
 
-      last = result;
+      console.log(`[nairaland] ${section} page ${page} — ${threads.length} threads so far.`);
     } catch (err) {
-      last = {
-        source: source.name,
-        method: fn.name,
-        items: [],
-        error: err.message,
-      };
+      console.error(`[nairaland] Error on ${section} page ${page}:`, err.message);
+    } finally {
+      await pageInstance.close();
     }
+
+    await new Promise(r => setTimeout(r, 2000 + Math.random() * 2000));
   }
 
-  return {
-    source: source.name,
-    method: "failed",
-    success: false,
-    items: [],
-    error: last?.error || "All strategies failed",
-  };
+  // ── KEY CHANGE ──────────────────────────────────────────────────────────────
+  // Do NOT sort by replyCount — that lifts old viral threads above fresh ones.
+  // Nairaland already serves threads sorted by most-recent-activity first.
+  // Just deduplicate and take the top N in arrival order.
+  // ────────────────────────────────────────────────────────────────────────────
+  return threads.slice(0, CONFIG.threadsPerSection);
 }
-
-/* ------------------ MAIN EXPORT ------------------ */
-
-export async function runScraper() {
-  const results = [];
-
-  for (const source of SOURCES) {
-    const result = await scrapeSource(source);
-
-    console.log(
-      `[${result.method}] ${source.name}: ${result.items.length}`
-    );
-
-    results.push(result);
-  }
-
-  const allItems = dedupe(
-  results.flatMap(r => Array.isArray(r.items) ? r.items : [])
-  );
-console.log(
-  "[debug] result shapes:",
-  results.map(r => ({
-    source: r.source,
-    method: r.method,
-    itemsType: typeof r.items,
-    isArray: Array.isArray(r.items),
-  }))
-);
-  return {
-    fetchedAt: new Date().toISOString(),
-    totalSources: results.length,
-    totalItems: allItems.length,
-    sources: results,
-    items: allItems,
-  };
-}
-
-/* ------------------ BACKWARD COMPAT (IMPORTANT) ------------------ */
-/**
- * If your scheduler still expects:
- * fetchConsumerSentiment()
- * we expose it here safely.
- */
 
 export async function fetchConsumerSentiment() {
-  return runScraper();
+  const browser = await chromium.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-blink-features=AutomationControlled'],
+  });
+
+  const context = await browser.newContext({
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    locale: 'en-US',
+    viewport: { width: 1366, height: 768 },
+  });
+
+  const results = [];
+
+  try {
+    for (const section of CONFIG.sections) {
+      const threads = await fetchSection(context, section);
+      console.log(`[nairaland] ${section}: ${threads.length} top threads retained.`);
+
+      threads.forEach(t => {
+        results.push({
+          ...t,
+          brandMentions: extractBrands(t.title),
+          productMentions: [],
+          sentiment: getSentiment(t.title),
+        });
+      });
+
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  } finally {
+    await context.close();
+    await browser.close();
+  }
+
+  return {
+    fetchedAt: new Date().toISOString(),
+    freshness: 'recent',
+    totalThreads: results.length,
+    threads: results,
+  };
 }

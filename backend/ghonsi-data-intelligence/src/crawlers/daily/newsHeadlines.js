@@ -124,13 +124,24 @@ async function fetchRSSFeed(source, limit = HEADLINES_PER_SOURCE) {
       safeText(item["content:encoded"]) ??
       null;
 
+    const title = stripHtml(safeText(item.title));
+    const summary = rawSummary ? stripHtml(rawSummary)?.slice(0, 300) : null;
+    const publishedAt = safeText(item.pubDate ?? item.published ?? item.updated) ?? null;
+    const sourceName = source.name;
+
     return {
-      title: stripHtml(safeText(item.title)),
+      title,
       url: link,
-      summary: rawSummary ? stripHtml(rawSummary)?.slice(0, 300) : null,
-      publishedAt: safeText(item.pubDate ?? item.published ?? item.updated) ?? null,
-      source: source.name,
+      summary,
+      publishedAt,
+      source: sourceName,
       category: source.category,
+      extracted_content: summary || title,
+      key_values: JSON.stringify({
+        headline: title,
+        source: sourceName,
+        published_at: publishedAt,
+      }),
     };
   }).filter((h) => h.title);
 }

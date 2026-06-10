@@ -120,6 +120,13 @@ function parseRatesTable(html) {
       market: "parallel",
       source: "nairatoday.com",
       sourceUrl: SOURCE_URL,
+      extracted_content: `Black market ${code}/NGN: buy ₦${buyRate}, sell ₦${sellRate}, CBN rate ₦${cbnRate}.`,
+      key_values: JSON.stringify({
+        [`${code}_black_buy`]: buyRate,
+        [`${code}_black_sell`]: sellRate,
+        [`${code}_cbn`]: cbnRate,
+        [`${code}_change_percent`]: change,
+      }),
     };
   });
 

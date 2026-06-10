@@ -40,21 +40,6 @@ function getISOWeek(date) {
 // GOOGLE TRENDS
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/trends:
- *   get:
- *     tags: [Market Data]
- *     summary: Get stored Google Trends Nigeria
- *     parameters:
- *       - name: limit
- *         in: query
- *         schema: { type: integer }
- *         description: Max trends to return
- *     responses:
- *       200:
- *         description: List of trends
- */
 router.get('/trends', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
@@ -72,16 +57,6 @@ router.get('/trends', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/trends/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger a Google Trends crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/trends/run', async (req, res) => {
   try {
     const { fetchDailyTrends } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/googleTrends.js');
@@ -97,12 +72,37 @@ router.post('/trends/run', async (req, res) => {
       image_url: t.imageUrl,
       image_source: t.imageSource,
       articles: t.articles || [],
+      extracted_content: t.extracted_content,
+      key_values: t.key_values,
       raw_data: t,
     }));
 
     const { error } = await supabase
       .from('google_trends')
       .upsert(rows, { onConflict: 'pull_date,pull_time_slot,rank' });
+
+    // Backfill missing extracted_content/key_values for historical rows
+    const { data: missingTrends, error: missingFetchErr } = await supabase
+      .from('google_trends')
+      .select('id, rank, query, traffic_volume, extracted_content, key_values')
+      .is('extracted_content', null)
+      .limit(500);
+    if (missingFetchErr) throw missingFetchErr;
+
+    if (missingTrends?.length) {
+      for (const t of missingTrends) {
+        const extracted = `Trending #${t.rank}: ${t.query} — ${t.traffic_volume} searches.`;
+        const kv = JSON.stringify({
+          query: t.query,
+          traffic_volume: t.traffic_volume,
+        });
+        const { error: updErr } = await supabase
+          .from('google_trends')
+          .update({ extracted_content: extracted, key_values: kv })
+          .eq('id', t.id);
+        if (updErr) throw updErr;
+      }
+    }
     if (error) throw error;
 
     await logCrawl('googleTrends', 'success', rows.length);
@@ -117,22 +117,13 @@ router.post('/trends/run', async (req, res) => {
 // OFFICIAL CBN EXCHANGE RATES
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/rates/official:
- *   get:
- *     tags: [Market Data]
- *     summary: Get official CBN exchange rates
- *     responses:
- *       200:
- *         description: Official rates (USD, EUR, GBP)
- */
 router.get('/rates/official', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('exchange_rates')
       .select('*')
-      .eq('source', 'cbn_official')
+      .eq('data_type', 'exchange_rate')
+      .eq('source_name', 'cbn_official')
       .order('rate_date', { ascending: false })
       .limit(10);
     if (error) throw error;
@@ -142,16 +133,6 @@ router.get('/rates/official', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/rates/official/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger CBN official rates crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/rates/official/run', async (req, res) => {
   try {
     const { fetchCBNRates } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/exchangeRates.js');
@@ -159,19 +140,25 @@ router.post('/rates/official/run', async (req, res) => {
 
     const rows = Object.entries(result.rates).map(([code, rate]) => ({
       source: 'cbn_official',
+      source_name: 'cbn_official',
       currency: code,
+      pair: rate.pair,
       buying_rate: rate.buyingRate,
       selling_rate: rate.sellingRate,
       central_rate: rate.centralRate,
       rate_date: rate.date,
       previous_buying_rate: null,
       previous_selling_rate: null,
+      extracted_content: rate.extracted_content,
+      key_values: rate.key_values,
       raw_data: rate,
     }));
 
     const { error } = await supabase
       .from('exchange_rates')
-      .upsert(rows, { onConflict: 'source,currency,rate_date' });
+      .upsert(rows, {
+        onConflict: 'source_name,currency,rate_date',
+      });
     if (error) throw error;
 
     await logCrawl('cbnExchangeRates', 'success', rows.length);
@@ -186,16 +173,6 @@ router.post('/rates/official/run', async (req, res) => {
 // PARALLEL MARKET RATES
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/rates/parallel:
- *   get:
- *     tags: [Market Data]
- *     summary: Get parallel (black) market exchange rates
- *     responses:
- *       200:
- *         description: Black market rates
- */
 router.get('/rates/parallel', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -211,16 +188,6 @@ router.get('/rates/parallel', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/rates/parallel/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger parallel market rates crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/rates/parallel/run', async (req, res) => {
   try {
     const { fetchBlackMarketRates } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/blackMarketRates.js');
@@ -228,6 +195,7 @@ router.post('/rates/parallel/run', async (req, res) => {
 
     const rows = Object.entries(result.rates).map(([code, rate]) => ({
       source: 'black_market',
+      source_name: 'nairatoday_parallel',
       currency: code,
       buying_rate: rate.buyRate,
       selling_rate: rate.sellRate,
@@ -235,12 +203,16 @@ router.post('/rates/parallel/run', async (req, res) => {
       rate_date: result.fetchedAt.split('T')[0],
       previous_buying_rate: null,
       previous_selling_rate: null,
+      extracted_content: rate.extracted_content,
+      key_values: rate.key_values,
       raw_data: rate,
     }));
 
     const { error } = await supabase
       .from('exchange_rates')
-      .upsert(rows, { onConflict: 'source,currency,rate_date' });
+      .upsert(rows, {
+        onConflict: 'source,currency,rate_date',
+      });
     if (error) throw error;
 
     await logCrawl('blackMarketRates', 'success', rows.length);
@@ -255,25 +227,6 @@ router.post('/rates/parallel/run', async (req, res) => {
 // NEWS HEADLINES
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/news:
- *   get:
- *     tags: [Market Data]
- *     summary: Get latest news headlines
- *     parameters:
- *       - name: limit
- *         in: query
- *         schema: { type: integer }
- *         description: Max headlines to return
- *       - name: source
- *         in: query
- *         schema: { type: string }
- *         description: Comma-separated source names
- *     responses:
- *       200:
- *         description: News headlines
- */
 router.get('/news', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 30;
@@ -293,34 +246,53 @@ router.get('/news', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/news/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger news headlines crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/news/run', async (req, res) => {
   try {
     const { fetchNewsHeadlines } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/newsHeadlines.js');
     const result = await fetchNewsHeadlines();
 
     const rows = result.allHeadlines.map(h => ({
-      source: h.source || 'unknown',
+      source: h.source ?? h.source_name,
+      source_name: h.source ?? h.source_name,
       title: h.title,
       url: h.url,
       published_at: h.publishedAt ? new Date(h.publishedAt).toISOString() : null,
       summary: h.summary || '',
+      extracted_content: h.extracted_content,
+      key_values: h.key_values,
       raw_data: h,
     }));
 
     const { error } = await supabase
       .from('news_headlines')
-      .upsert(rows, { onConflict: 'source,url' });
+      .upsert(rows, { onConflict: 'source_name,url' });
     if (error) throw error;
+
+    // Backfill old rows missing extracted_content/key_values
+    const { data: oldMissing, error: missingFetchErr } = await supabase
+      .from('news_headlines')
+      .select('id, title, summary, extracted_content, key_values, source_name')
+      .or('extracted_content.is.null,key_values.is.null')
+      .limit(500);
+    if (missingFetchErr) throw missingFetchErr;
+
+    if (oldMissing?.length) {
+      for (const row of oldMissing) {
+        const extracted = row.summary ? row.summary : row.title;
+        const keyValues = JSON.stringify({
+          headline: row.title,
+          source: row.source_name,
+        });
+        const { error: updateErr } = await supabase
+          .from('news_headlines')
+          .update({
+            extracted_content: extracted,
+            key_values: keyValues,
+          })
+          .eq('id', row.id);
+        if (updateErr) throw updateErr;
+      }
+    }
 
     await logCrawl('newsHeadlines', 'success', rows.length);
     res.json({ success: true, inserted: rows.length });
@@ -334,21 +306,6 @@ router.post('/news/run', async (req, res) => {
 // TIKTOK MANUAL TRENDS
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/tiktok:
- *   get:
- *     tags: [Market Data]
- *     summary: Get manual TikTok trends
- *     parameters:
- *       - name: date
- *         in: query
- *         schema: { type: string }
- *         description: Date in YYYY-MM-DD format
- *     responses:
- *       200:
- *         description: TikTok trends for the given date
- */
 router.get('/tiktok', async (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
@@ -364,34 +321,6 @@ router.get('/tiktok', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/tiktok:
- *   post:
- *     tags: [Market Data]
- *     summary: Log today's TikTok trends (manual entry)
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               trends:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     rank: { type: integer }
- *                     hashtag: { type: string }
- *                     sound_title: { type: string }
- *                     category: { type: string }
- *                     notes: { type: string }
- *               recordedBy: { type: string }
- *     responses:
- *       200:
- *         description: Number of trends inserted
- */
 router.post('/tiktok', async (req, res) => {
   try {
     const { trends, recordedBy } = req.body;
@@ -423,16 +352,6 @@ router.post('/tiktok', async (req, res) => {
 // FUEL PRICE
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/fuel:
- *   get:
- *     tags: [Market Data]
- *     summary: Get current fuel price
- *     responses:
- *       200:
- *         description: Fuel price
- */
 router.get('/fuel', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -447,22 +366,12 @@ router.get('/fuel', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/fuel/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger fuel price crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/fuel/run', async (req, res) => {
   try {
     const { fetchFuelPrices } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/fuelPrices.js');
     const result = await fetchFuelPrices();
 
-    if (result.price === null) {
+    if (result.price === null || result.price === undefined) {
       await logCrawl('fuelPrices', 'partial', 0, 'No pump price found on page');
       return res.json({ success: true, inserted: 0, message: 'Price not available on NNPCL page today' });
     }
@@ -491,16 +400,6 @@ router.post('/fuel/run', async (req, res) => {
 // NAIRALAND / CONSUMER SENTIMENT
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/sentiment:
- *   get:
- *     tags: [Market Data]
- *     summary: Get Nairaland sentiment threads
- *     responses:
- *       200:
- *         description: Sentiment threads
- */
 router.get('/sentiment', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -515,16 +414,6 @@ router.get('/sentiment', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/sentiment/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger Nairaland sentiment crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/sentiment/run', async (req, res) => {
   try {
     const { fetchConsumerSentiment } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/consumerSentiment.js');
@@ -572,16 +461,6 @@ router.post('/sentiment/run', async (req, res) => {
 // BELLANAIJA LIFESTYLE
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/lifestyle:
- *   get:
- *     tags: [Market Data]
- *     summary: Get BellaNaija lifestyle posts
- *     responses:
- *       200:
- *         description: Lifestyle posts
- */
 router.get('/lifestyle', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -596,16 +475,6 @@ router.get('/lifestyle', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/lifestyle/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger BellaNaija lifestyle crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/lifestyle/run', async (req, res) => {
   try {
     const { fetchLifestyleTrends } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/lifestyleTrends.js');
@@ -636,16 +505,6 @@ router.post('/lifestyle/run', async (req, res) => {
 // REGULATORY UPDATES
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/regulatory:
- *   get:
- *     tags: [Market Data]
- *     summary: Get regulatory updates (APCON, FCCPC, NAFDAC)
- *     responses:
- *       200:
- *         description: Regulatory items
- */
 router.get('/regulatory', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -660,16 +519,6 @@ router.get('/regulatory', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/regulatory/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger regulatory updates crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/regulatory/run', async (req, res) => {
   try {
     const { fetchRegulatoryUpdates } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/regulatoryUpdates.js');
@@ -701,16 +550,6 @@ router.post('/regulatory/run', async (req, res) => {
 // FINTECH UPDATES
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/fintech:
- *   get:
- *     tags: [Market Data]
- *     summary: Get fintech/payment ecosystem updates
- *     responses:
- *       200:
- *         description: Fintech items
- */
 router.get('/fintech', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -725,16 +564,6 @@ router.get('/fintech', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/fintech/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger fintech updates crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/fintech/run', async (req, res) => {
   try {
     const { fetchFintechUpdates } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/fintechUpdates.js');
@@ -771,16 +600,6 @@ router.post('/fintech/run', async (req, res) => {
 // CPI REPORTS
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/cpi:
- *   get:
- *     tags: [Market Data]
- *     summary: Get latest CPI report indicators
- *     responses:
- *       200:
- *         description: CPI data
- */
 router.get('/cpi', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -796,16 +615,6 @@ router.get('/cpi', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/cpi/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger CPI report crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/cpi/run', async (req, res) => {
   try {
     const { fetchCPIReport } = await import('../../ghonsi-data-intelligence/src/crawlers/monthly/cpiReports.js');
@@ -849,16 +658,6 @@ router.post('/cpi/run', async (req, res) => {
 // HEALTH CHECK
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/health:
- *   get:
- *     tags: [Market Data]
- *     summary: Market data crawl status
- *     responses:
- *       200:
- *         description: Health check with latest crawl statuses
- */
 router.get('/health', async (req, res) => {
   try {
     const { data: logs } = await supabase
@@ -881,21 +680,6 @@ router.get('/health', async (req, res) => {
 // NBS REPORTS
 // ═══════════════════════════════════════════════════════════════════
 
-/**
- * @swagger
- * /api/v1/nbs:
- *   get:
- *     tags: [Market Data]
- *     summary: Get latest NBS reports
- *     parameters:
- *       - name: limit
- *         in: query
- *         schema: { type: integer }
- *         description: Max reports to return
- *     responses:
- *       200:
- *         description: List of NBS reports
- */
 router.get('/nbs', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 10;
@@ -911,16 +695,6 @@ router.get('/nbs', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/v1/nbs/run:
- *   post:
- *     tags: [Market Data]
- *     summary: Trigger NBS reports crawl
- *     responses:
- *       200:
- *         description: Crawl result
- */
 router.post('/nbs/run', async (req, res) => {
   try {
     const { fetchNBSReports } = await import('../../ghonsi-data-intelligence/src/crawlers/weekly/nbsReports.js');
@@ -945,4 +719,151 @@ router.post('/nbs/run', async (req, res) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// E‑COMMERCE PRICES
+// ═══════════════════════════════════════════════════════════════════
+
+router.get('/ecommerce', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const { data, error } = await supabase
+      .from('ecommerce_prices')
+      .select('*')
+      .order('crawl_date', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+router.post('/ecommerce/run', async (req, res) => {
+  try {
+    const { fetchEcommercePrices } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/ecommerce.js');
+    const result = await fetchEcommercePrices({ platform: 'all', limit: 50 });
+
+    if (!result.products || result.products.length === 0) {
+      await logCrawl('ecommerce', 'partial', 0, result.reason || 'No products found');
+      return res.json({ success: true, inserted: 0, message: 'No products returned' });
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const seen = new Set();
+    const rows = [];
+    for (const p of result.products) {
+      const key = `${p.platform}|${p.product_url}|${today}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const sourceName = p.platform === 'konga' ? 'konga' : 'jumia';
+      rows.push({
+        source_name: sourceName,
+        platform: p.platform,
+        category: p.category,
+        product_name: p.product_name,
+        product_url: p.product_url,
+        price: p.price,
+        previous_price: p.previous_price,
+        price_delta_percent: p.price_delta_percent,
+        flash_sale: p.flash_sale,
+        extracted_content: `${p.product_name} - ₦${p.price}`,
+        key_values: JSON.stringify({
+          platform: p.platform,
+          category: p.category,
+          product_name: p.product_name,
+          price: p.price,
+          previous_price: p.previous_price,
+          price_delta_percent: p.price_delta_percent,
+          flash_sale: p.flash_sale,
+        }),
+        crawl_date: today,
+        raw_data: p,
+      });
+    }
+
+    const { error } = await supabase
+      .from('ecommerce_prices')
+      .upsert(rows, { onConflict: 'platform,product_url,crawl_date' });
+
+    // Backfill old rows missing extracted_content and/or key_values
+    const { data: missingProducts, error: missingFetchErr } = await supabase
+      .from('ecommerce_prices')
+      .select('id, product_name, price, extracted_content, key_values, source_name, category, flash_sale, price_delta_percent, previous_price')
+      .or('extracted_content.is.null,key_values.is.null')
+      .limit(500);
+    if (missingFetchErr) throw missingFetchErr;
+
+    if (missingProducts?.length) {
+      for (const row of missingProducts) {
+        const extracted = `${row.product_name} - ₦${row.price}`;
+        const kv = row.key_values
+          ? row.key_values
+          : JSON.stringify({
+              platform: row.source_name,
+              category: row.category || null,
+              product_name: row.product_name,
+              price: row.price,
+              previous_price: row.previous_price,
+              price_delta_percent: row.price_delta_percent,
+              flash_sale: row.flash_sale,
+            });
+
+        const { error: updErr } = await supabase
+          .from('ecommerce_prices')
+          .update({
+            extracted_content: extracted,
+            key_values: kv,
+          })
+          .eq('id', row.id);
+        if (updErr) throw updErr;
+      }
+    }
+
+    if (error) throw error;
+
+    await logCrawl('ecommerce', 'success', rows.length);
+    res.json({ success: true, inserted: rows.length });
+  } catch (err) {
+    await logCrawl('ecommerce', 'failed', 0, err.message);
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+/**
+ * @swagger
+ * /api/v1/insights/search:
+ *   get:
+ *     tags: [Market Data]
+ *     summary: Search the Nigerian marketing insights knowledge base
+ *     parameters:
+ *       - name: q
+ *         in: query
+ *         required: true
+ *         schema: { type: string }
+ *         description: Natural‑language query about Nigerian marketing
+ *       - name: limit
+ *         in: query
+ *         schema: { type: integer }
+ *         description: Max results (default 5)
+ *     responses:
+ *       200:
+ *         description: Ranked insights with similarity scores
+ */
+router.get('/insights/search', async (req, res) => {
+  const q = req.query.q;
+  if (!q) return res.status(400).json({ success: false, error: 'Missing query param "q"' });
+
+  try {
+    const { embedQuery } = await import('../utils/embed.js');
+    const queryEmbedding = await embedQuery(q);
+    const { data, error } = await supabase.rpc('search_insights', {
+      query_embedding: queryEmbedding,
+      match_limit: 5
+    });
+    if (error) throw error;
+    res.json({ success: true, data });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
 module.exports = { router, setSupabaseClient };
