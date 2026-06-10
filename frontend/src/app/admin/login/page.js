@@ -10,23 +10,31 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Simple password check — change this to your admin password
-    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ghonsi-admin-2024';
+    try {
+      const response = await fetch('/api/admin/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
 
-    setTimeout(() => {
-      if (password === ADMIN_PASSWORD) {
+      const data = await response.json();
+
+      if (response.ok && data.success) {
         localStorage.setItem('adminAuth', 'true');
         router.push('/admin/dashboard');
       } else {
         setError('Invalid password. Please try again.');
       }
+    } catch (error) {
+      setError('Connection error. Please try again.');
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
