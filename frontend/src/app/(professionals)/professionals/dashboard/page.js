@@ -544,6 +544,16 @@ const MyMiniMe = () => {
               <p className="text-xs text-gray-400 mt-0.5">10× your productivity with AI that works in your style</p>
             </div>
           </div>
+
+          {/* Requested: Mini Me Control Panel */}
+          <button
+            onClick={() => router.push('/professionals/mini-them-control')}
+            className="w-full mb-3 py-3 rounded-xl bg-white/5 border border-white/20 hover:border-[#C19A4A]/50 text-white text-sm font-semibold transition-all flex items-center justify-center gap-2"
+          >
+            <Bot size={18} />
+            Mini Me Control Panel
+          </button>
+
           <button
             onClick={() => router.push('/mini-them-handover')}
             className="w-full py-3 rounded-xl bg-gradient-to-r from-[#C19A4A] to-[#d9b563] text-[#0B0F1B] font-bold hover:shadow-[0_0_30px_rgba(193,154,74,0.5)] transition-all duration-300 flex items-center justify-center gap-2"
@@ -677,7 +687,7 @@ function Dashboard() {
                 <div className="lg:hidden mt-8">
                   <MyMiniMe />
                 </div>
-                
+
                 {/* Desktop: Quick Actions at bottom, Mobile: after My Mini-Me */}
                 <div className="mt-8">
                   <QuickActions />

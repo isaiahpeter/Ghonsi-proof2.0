@@ -226,47 +226,71 @@ const DashboardHirers = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-6 mb-6 border-b border-white/10">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`pb-3 text-sm font-medium transition-all ${
-              activeTab === 'overview'
-                ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('jobs')}
-            className={`pb-3 text-sm font-medium transition-all ${
-              activeTab === 'jobs'
-                ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            My Jobs
-          </button>
-          <button
-            onClick={() => setActiveTab('applicants')}
-            className={`pb-3 text-sm font-medium transition-all ${
-              activeTab === 'applicants'
-                ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Applicants
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`pb-3 text-sm font-medium transition-all ${
-              activeTab === 'settings'
-                ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
-                : 'text-white/60 hover:text-white'
-            }`}
-          >
-            Settings
-          </button>
+        <div className="flex flex-col gap-4 mb-6">
+          {/* Navigation buttons (requested) */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => router.push('/hirers/search')}
+              className="bg-white/5 border border-white/20 hover:border-[#C19A4A]/50 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all"
+            >
+              Search
+            </button>
+            <button
+              onClick={() => router.push('/hirers/request')}
+              className="bg-white/5 border border-white/20 hover:border-[#C19A4A]/50 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all"
+            >
+              Request
+            </button>
+            <button
+              onClick={() => router.push('/hirers/mini-them-control')}
+              className="bg-[#C19A4A] hover:bg-[#A8863D] text-black text-xs font-bold px-4 py-2 rounded-lg transition-all"
+            >
+              Mini Me Control
+            </button>
+          </div>
+
+          <div className="flex items-center gap-6 border-b border-white/10 pb-2">
+            <button
+              onClick={() => setActiveTab('overview')}
+              className={`pb-3 text-sm font-medium transition-all ${
+                activeTab === 'overview'
+                  ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('jobs')}
+              className={`pb-3 text-sm font-medium transition-all ${
+                activeTab === 'jobs'
+                  ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              My Jobs
+            </button>
+            <button
+              onClick={() => setActiveTab('applicants')}
+              className={`pb-3 text-sm font-medium transition-all ${
+                activeTab === 'applicants'
+                  ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Applicants
+            </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`pb-3 text-sm font-medium transition-all ${
+                activeTab === 'settings'
+                  ? 'text-[#C19A4A] border-b-2 border-[#C19A4A]'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Settings
+            </button>
+          </div>
         </div>
 
         {/* Overview Tab */}

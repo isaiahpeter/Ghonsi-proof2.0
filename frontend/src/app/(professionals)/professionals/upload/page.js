@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Copy, X, ChevronUp, ChevronDown, Upload as UploadIcon } from 'lucide-react';
 import { getCurrentUser } from '@/utils/supabaseAuth';
-import { uploadProof } from '@/utils/proofsApi';
+import { uploadProof, saveProofToPortfolio } from '@/utils/proofsApi';
 import { extractDocumentData, supportsExtraction } from '@/utils/extractionApi';
 import { uploadDocumentWithMetadata } from '@/utils/pinataUpload';
 import { saveFormData, getFormData, clearFormData } from '@/utils/formPersistence';
@@ -38,6 +38,7 @@ function Upload() {
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [showSubmittedModal, setShowSubmittedModal] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSavingPortfolio, setIsSavingPortfolio] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [supportingError, setSupportingError] = useState('');
   const [isExtracting, setIsExtracting] = useState(false);
@@ -237,6 +238,20 @@ function Upload() {
     { value: 'milestones', label: 'Career Milestones (Promotions / Awards)' },
     { value: 'community_contributions', label: 'Community Contributions / Public Work' },
   ];
+
+  const isVideoUrl = (url) => {
+    if (!url) return false;
+    return /youtube\.com\/watch|youtu\.be\/|vimeo\.com\/\d+/.test(url);
+  };
+
+  const getVideoEmbedUrl = (url) => {
+    if (!url) return null;
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    return null;
+  };
 
   const extractProofData = async (file, selectedProofType) => {
     if (!supportsExtraction(selectedProofType)) return null;
@@ -448,6 +463,56 @@ function Upload() {
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
+  };
+
+  const handleSaveToPortfolio = async (e) => {
+    e.preventDefault();
+    setUploadError('');
+    let hasError = false;
+
+    if (!proofName.trim() || !summary.trim() || !proofType) {
+      setUploadError('Please fill in all required fields.');
+      hasError = true;
+    }
+
+    const hasVideo = isVideoUrl(referenceLink);
+    if (!hasVideo && referenceFiles.length === 0) {
+      setSupportingError('A Reference Document is required. Or add a YouTube/Vimeo link above to upload without a file.');
+      hasError = true;
+    }
+
+    if (hasError) return;
+
+    setIsSavingPortfolio(true);
+    setShowPendingModal(true);
+
+    try {
+      const user = await getCurrentUser();
+      if (!user) throw new Error('You must be logged in to save proofs');
+
+      await saveProofToPortfolio(
+        {
+          proofType,
+          proofName: proofName.trim(),
+          summary: summary.trim(),
+          referenceLink: referenceLink || null,
+          userId: user.id,
+          extractedData: extractedApiData || null,
+        },
+        referenceFiles
+      );
+
+      clearFormData('uploadProof');
+      setShowPendingModal(false);
+      setSubmissionResult({ proofName: proofName.trim(), portfolioOnly: true });
+      setShowSubmittedModal(true);
+    } catch (error) {
+      console.error('Error saving proof to portfolio:', error);
+      addToast(error.message || 'Failed to save proof', 'error');
+      setShowPendingModal(false);
+    } finally {
+      setIsSavingPortfolio(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -1386,27 +1451,41 @@ function Upload() {
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex items-center justify-between pt-8 mt-4 border-t border-white/5">
+                <div className="flex flex-col sm:flex-row items-center justify-between pt-8 mt-4 border-t border-white/5 gap-3">
                   <button
                     type="button"
                     onClick={resetAll}
-                    className="text-white text-sm font-medium hover:text-[#C19A4A] transition-colors px-4 py-2"
+                    className="text-white text-sm font-medium hover:text-[#C19A4A] transition-colors px-4 py-2 order-3 sm:order-1"
                   >
                     Cancel
                   </button>
-                  <button
-                    type="submit"
-                    disabled={isUploading}
-                    className="group relative px-8 py-3.5 bg-gradient-to-r from-[#C19A4A] to-[#d9b563] text-[#030712] font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(193,154,74,0.4)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center gap-2"
-                  >
-                    <span className="relative z-10">
-                      {isUploading ? 'Uploading...' : connected ? 'Upload' : 'Connect Wallet & Upload'}
-                    </span>
-                    {!isUploading && (
-                      <i className="fa-solid fa-arrow-right relative z-10 text-sm group-hover:translate-x-1 transition-transform"></i>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#d9b563] to-[#C19A4A] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
+                  <div className="flex items-center gap-3 order-1 sm:order-2 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={handleSaveToPortfolio}
+                      disabled={isSavingPortfolio || isUploading}
+                      className="flex-1 sm:flex-none px-6 py-3.5 rounded-xl border border-[#C19A4A] text-[#C19A4A] text-sm font-bold hover:bg-[#C19A4A]/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      {isSavingPortfolio ? (
+                        <><i className="fa-solid fa-spinner fa-spin text-xs"></i>Saving...</>
+                      ) : (
+                        <><i className="fa-solid fa-folder-plus text-xs"></i>Save to Portfolio</>
+                      )}
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isUploading || isSavingPortfolio}
+                      className="group relative flex-1 sm:flex-none px-6 py-3.5 bg-gradient-to-r from-[#C19A4A] to-[#d9b563] text-[#030712] font-bold rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(193,154,74,0.4)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <span className="relative z-10 text-sm">
+                        {isUploading ? 'Uploading...' : connected ? 'Submit On-chain' : 'Connect Wallet & Submit'}
+                      </span>
+                      {!isUploading && (
+                        <i className="fa-solid fa-link relative z-10 text-xs group-hover:translate-x-1 transition-transform"></i>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#d9b563] to-[#C19A4A] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </button>
+                  </div>
                 </div>
 
               </form>
@@ -1584,7 +1663,7 @@ function Upload() {
                     Upload Another
                   </button>
                   <button
-                    onClick={() => (window.location.href = '/dashboard')}
+                    onClick={() => router.push(submissionResult?.portfolioOnly ? '/professionals/portfolio' : '/professionals/dashboard')}
                     className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#C19A4A] to-[#d9b563] text-[#030712] text-sm font-bold hover:shadow-[0_0_20px_rgba(193,154,74,0.4)] transition-all"
                   >
                     Dashboard

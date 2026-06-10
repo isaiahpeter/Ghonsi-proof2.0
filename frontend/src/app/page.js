@@ -276,6 +276,36 @@ export default function HomePage() {
           ctaHref="mailto:partnerships@ghonsiproof.com"
         />
 
+        {/* ── ROLE ENTRY ── */}
+        <section className="mb-20 px-5 md:px-12 lg:px-20">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl md:text-3xl font-bold font-[Inter] mb-2">Choose your role</h2>
+              <p className="text-gray-300 text-base">Log in to continue as Talent or Hirer</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+              <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500 overflow-hidden">
+                <a
+                  href="/login?role=talent"
+                  className="block w-full bg-[#0B0F1B] text-white py-3 rounded-xl font-semibold hover:bg-[#151925] transition-colors text-center"
+                >
+                  Talent Login
+                </a>
+              </div>
+
+              <div className="relative p-[2px] rounded-xl bg-gradient-to-br from-[#C19A4A] via-[#d9b563] to-blue-500 overflow-hidden">
+                <a
+                  href="/login?role=hirer"
+                  className="block w-full bg-[#0B0F1B] text-white py-3 rounded-xl font-semibold hover:bg-[#151925] transition-colors text-center"
+                >
+                  Hirer Login
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* ── FINAL CTA ── */}
         <FinalCTASection
           primaryHref="/login"

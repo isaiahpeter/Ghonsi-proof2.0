@@ -73,6 +73,40 @@ export const uploadProof = async (
   }
 };
 
+export const saveProofToPortfolio = async (proofData, referenceFiles = []) => {
+  try {
+    const userId = proofData.userId;
+    if (!userId) throw new Error('User not authenticated');
+
+    const { data: proof, error: proofError } = await supabase
+      .from('proofs')
+      .insert({
+        user_id: userId,
+        proof_type: proofData.proofType,
+        proof_name: proofData.proofName,
+        summary: proofData.summary,
+        reference_link: proofData.referenceLink || null,
+        file_ipfs_hash: null,
+        file_ipfs_url: null,
+        metadata_ipfs_hash: null,
+        metadata_ipfs_url: null,
+        blockchain_tx: null,
+        status: 'portfolio_only',
+        extracted_data: proofData.extractedData || null,
+      })
+      .select()
+      .single();
+
+    if (proofError) throw proofError;
+
+    const fileRecords = await uploadFiles(proof.id, referenceFiles, 'reference', userId);
+    return { proof, referenceFiles: fileRecords };
+  } catch (error) {
+    console.error('Save proof to portfolio error:', error);
+    throw error;
+  }
+};
+
 // Helper function to upload files to Supabase Storage
 const uploadFiles = async (proofId, files, fileType, userId) => {
   const uploadedFiles = [];

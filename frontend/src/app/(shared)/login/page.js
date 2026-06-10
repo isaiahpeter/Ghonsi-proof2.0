@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@/hooks/useWallet';
 import { sendOTPToEmail, verifyOTP, signInWithWallet } from '@/utils/supabaseAuth';
@@ -18,10 +18,65 @@ function Login() {
 
   const router = useRouter();
   const location = usePathname();
+  const searchParams = useSearchParams();
   const { connected, sign, getWalletAddress } = useWallet();
+
+  const roleParam = (() => {
+    const raw = searchParams?.get?.('role');
+    if (!raw) return null;
+    const normalized = String(raw).toLowerCase().trim();
+    if (normalized === 'talent') return 'talent';
+    if (normalized === 'professional') return 'professional';
+    if (normalized === 'hirer') return 'hirer';
+    return null;
+  })();
+
+  const routeAfterUserType = async ({ userId, currentUserType }) => {
+    if (!userId) return;
+
+    try {
+      if (currentUserType === 'hirer') {
+        const { data: domainHirerRow } = await supabase
+          .from('domain_questions_hirers')
+          .select('user_id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (!domainHirerRow) {
+          router.push('/hirers/create-profile');
+        } else {
+          router.push('/hirers/dashboard');
+        }
+        return;
+      }
+
+      if (currentUserType === 'professional' || currentUserType === 'talent') {
+        const { data: domainTalentRow } = await supabase
+          .from('domain_questions_professionals')
+          .select('user_id')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (!domainTalentRow) {
+          router.push('/professionals/create-profile');
+        } else {
+          router.push('/professionals/dashboard');
+        }
+        return;
+      }
+
+      // If user_type is missing/unknown, fall back to root.
+      router.push('/');
+    } catch (e) {
+      console.warn('routeAfterUserType failed:', e);
+      router.push('/');
+    }
+  };
 
   useEffect(() => {
     const params = new URLSearchParams('');
+    // NOTE: kept original behavior, but this is likely intended to read current location search.
+    // If you want it to work properly, replace with: new URLSearchParams(location?.search)
     setIsGetStarted(params.get('mode') === 'getstarted');
   }, [location]);
 
@@ -30,7 +85,7 @@ function Login() {
     const checkExistingSession = async () => {
       const walletAddress = localStorage.getItem('wallet_address');
       const sessionToken = localStorage.getItem('session_token');
-      
+
       if (walletAddress && sessionToken) {
         console.log('Existing wallet session found, redirecting...');
         setTimeout(() => router.push('/'), 500);
@@ -50,6 +105,7 @@ function Login() {
   const handleWalletAuth = async () => {
     setMessage('');
     setIsLoading(true);
+
     try {
       const walletAddress = getWalletAddress();
       if (!walletAddress) {
@@ -76,12 +132,12 @@ function Login() {
       const authResult = await signInWithWallet(walletAddress, {
         signature: signResult.signature,
         publicKey: signResult.publicKey,
-        walletName: localStorage.getItem('connected_wallet') || 'Phantom'
+        walletName: localStorage.getItem('connected_wallet') || 'Phantom',
       });
 
       if (authResult && authResult.userId) {
         console.log('Wallet authentication successful:', authResult.userId);
-        
+
         // Check if user has a profile with user_type set
         const { data: profile } = await supabase
           .from('profiles')
@@ -91,7 +147,26 @@ function Login() {
 
         // User needs to select type if: new user OR existing user without user_type
         const needsUserType = authResult.isNewUser || !profile || !profile.user_type;
-        
+
+        // If role is provided, attempt to store it in profiles.user_type
+        // so onboarding can route correctly without manual selection.
+        let resolvedUserType = profile?.user_type || null;
+        if (needsUserType && roleParam) {
+          try {
+            const updated = await supabase
+              .from('profiles')
+              .update({ user_type: roleParam })
+              .eq('user_id', authResult.userId)
+              .select('user_type')
+              .maybeSingle();
+
+            resolvedUserType = updated?.user_type ?? roleParam;
+          } catch (e) {
+            console.warn('Failed to set user_type from role param:', e);
+            resolvedUserType = roleParam;
+          }
+        }
+
         setHasSigned(true);
         setMessage('✅ Wallet verified! Redirecting...');
 
@@ -102,12 +177,10 @@ function Login() {
         // Dispatch custom event to notify Header of auth change
         window.dispatchEvent(new Event('auth-state-changed'));
 
-        // Redirect based on whether user needs to select type
-        if (needsUserType) {
-          setTimeout(() => router.push('/user-type'), 1000);
-        } else {
-          setTimeout(() => router.push('/'), 1000);
-        }
+        // Requested: domain-question-driven routing
+        setTimeout(() => {
+          routeAfterUserType({ userId: authResult.userId, currentUserType: resolvedUserType });
+        }, 800);
       } else {
         console.error('Authentication returned invalid result:', authResult);
         setMessage('Failed to authenticate. Please try again.');
@@ -128,6 +201,7 @@ function Login() {
       setMessage('Please enter a valid email address');
       return;
     }
+
     setIsLoading(true);
     setMessage('');
     try {
@@ -143,26 +217,73 @@ function Login() {
 
   const handleEmailSignIn = async (e) => {
     e.preventDefault();
+
     const trimmed = email.trim();
-    if (!trimmed || !validateEmail(trimmed)) { setMessage('Please enter a valid email address'); return; }
-    if (!otpSent) { setMessage('Please request an OTP code first'); return; }
-    if (!otpCode || otpCode.length !== 6) { setMessage('Please enter the complete 6-digit code'); return; }
+    if (!trimmed || !validateEmail(trimmed)) {
+      setMessage('Please enter a valid email address');
+      return;
+    }
+    if (!otpSent) {
+      setMessage('Please request an OTP code first');
+      return;
+    }
+    if (!otpCode || otpCode.length !== 6) {
+      setMessage('Please enter the complete 6-digit code');
+      return;
+    }
 
     setIsLoading(true);
     setMessage('');
+
     try {
       const result = await verifyOTP(trimmed, otpCode);
       console.log('OTP verified, user:', result.user?.id, 'isNewUser:', result.isNewUser);
+
       setMessage('Successfully signed in!');
-      
+
       // Dispatch custom event to notify Header of auth change
       window.dispatchEvent(new Event('auth-state-changed'));
-      
-      // Redirect new email users to user type selection
+
+      // Redirect new email users to user type selection (or onboarding directly if role param is provided)
+      const userId = result.user?.id;
+      let resolvedUserType = result.user?.user_type || null;
+
       if (result.isNewUser) {
-        setTimeout(() => router.push('/user-type'), 1000);
+        if (roleParam) {
+          try {
+            const updated = await supabase
+              .from('profiles')
+              .update({ user_type: roleParam })
+              .eq('user_id', userId)
+              .select('user_type')
+              .maybeSingle();
+
+            resolvedUserType = updated?.user_type ?? roleParam;
+          } catch (e2) {
+            console.warn('Failed to set user_type from role param (email):', e2);
+            resolvedUserType = roleParam;
+          }
+
+          setTimeout(() => {
+            routeAfterUserType({ userId, currentUserType: resolvedUserType });
+          }, 800);
+        } else {
+          setTimeout(() => router.push('/user-type'), 1000);
+        }
       } else {
-        setTimeout(() => router.push('/'), 1000);
+        // Existing user: query domain question tables to route
+        setTimeout(() => {
+          supabase
+            .from('profiles')
+            .select('user_type')
+            .eq('user_id', userId)
+            .maybeSingle()
+            .then(({ data }) => {
+              const currentType = data?.user_type || resolvedUserType;
+              routeAfterUserType({ userId, currentUserType: currentType });
+            })
+            .catch(() => router.push('/'));
+        }, 800);
       }
     } catch (error) {
       console.error('OTP verification error:', error);
@@ -172,7 +293,11 @@ function Login() {
     }
   };
 
-  const isSuccess = message.startsWith('✅') || message.startsWith('Wallet verified') || message.startsWith('Successfully') || message.startsWith('OTP sent');
+  const isSuccess =
+    message.startsWith('✅') ||
+    message.startsWith('Wallet verified') ||
+    message.startsWith('Successfully') ||
+    message.startsWith('OTP sent');
 
   return (
     <main>
@@ -189,10 +314,11 @@ function Login() {
           {['wallet', 'email'].map((tab) => (
             <button
               key={tab}
-              className={`flex items-center justify-center flex-1 max-w-[150px] py-3 px-[15px] rounded-lg text-[13px] font-semibold cursor-pointer transition-all duration-200 ease-in-out box-border whitespace-nowrap ${activeTab === tab
-                ? 'bg-[#C19A4A] text-[#1a1a2e] border-none'
-                : 'bg-white/10 text-white border border-white/20'
-                }`}
+              className={`flex items-center justify-center flex-1 max-w-[150px] py-3 px-[15px] rounded-lg text-[13px] font-semibold cursor-pointer transition-all duration-200 ease-in-out box-border whitespace-nowrap ${
+                activeTab === tab
+                  ? 'bg-[#C19A4A] text-[#1a1a2e] border-none'
+                  : 'bg-white/10 text-white border border-white/20'
+              }`}
               onClick={() => setActiveTab(tab)}
             >
               {tab === 'wallet' ? 'Wallet Connect' : 'Email Login'}
@@ -213,12 +339,6 @@ function Login() {
               verify ownership — no transaction fees.
             </p>
 
-            {/*
-              WalletMultiButton from @solana/wallet-adapter-react-ui handles everything:
-              - Desktop: shows extension picker modal
-              - Mobile: deeplinks to Phantom / Solflare / Backpack / Glow
-              - After connect: our useEffect fires signMessage via useWallet hook
-            */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
               <WalletMultiButton />
             </div>
@@ -230,21 +350,21 @@ function Login() {
             )}
 
             {connected && !isLoading && !message && activeTab === 'wallet' && (
-              <p className="text-green-400 text-sm text-center">
-                Wallet connected — requesting signature...
-              </p>
+              <p className="text-green-400 text-sm text-center">Wallet connected — requesting signature...</p>
             )}
 
             {message && (
-              <div className={`w-full p-3 rounded-lg text-sm text-center ${isSuccess
-                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                }`}>
+              <div
+                className={`w-full p-3 rounded-lg text-sm text-center ${
+                  isSuccess
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                }`}
+              >
                 {message}
               </div>
             )}
 
-            {/* Let user retry if they rejected the signature */}
             {!message.startsWith('✅') && connected && !isLoading && message && activeTab === 'wallet' && (
               <button
                 onClick={handleWalletAuth}
@@ -265,10 +385,13 @@ function Login() {
             <p className="text-sm text-[#ccc] mb-5">We'll send you a 6-digit code to verify your email.</p>
 
             {message && (
-              <div className={`mb-5 p-3 rounded-lg text-sm ${isSuccess
-                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                : 'bg-red-500/20 text-red-400 border border-red-500/30'
-                }`}>
+              <div
+                className={`mb-5 p-3 rounded-lg text-sm ${
+                  isSuccess
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                }`}
+              >
                 {message}
               </div>
             )}
@@ -321,12 +444,19 @@ function Login() {
       <div className="py-[30px] px-5 text-center">
         <p className="text-xs text-[#ccc] leading-[1.8] mb-[15px]">
           Don't have a wallet?{' '}
-          <a href="https://x.com/Ghonsiproof" className="text-[#C19A4A] no-underline hover:underline">Learn how to get one</a>
+          <a href="https://x.com/Ghonsiproof" className="text-[#C19A4A] no-underline hover:underline">
+            Learn how to get one
+          </a>
         </p>
         <p className="text-xs text-[#ccc] leading-[1.8] mb-[15px]">
           By connecting you agree to our{' '}
-          <a href="/terms" className="text-[#C19A4A] no-underline hover:underline">Terms of Service</a>{' '}and{' '}
-          <a href="/policy" className="text-[#C19A4A] no-underline hover:underline">Privacy Policy</a>
+          <a href="/terms" className="text-[#C19A4A] no-underline hover:underline">
+            Terms of Service
+          </a>{' '}
+          and{' '}
+          <a href="/policy" className="text-[#C19A4A] no-underline hover:underline">
+            Privacy Policy
+          </a>
         </p>
       </div>
     </main>
@@ -334,3 +464,4 @@ function Login() {
 }
 
 export default Login;
+
