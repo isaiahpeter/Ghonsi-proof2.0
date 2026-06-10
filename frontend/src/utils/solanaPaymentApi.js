@@ -26,9 +26,22 @@ export const USDT_MINT = new PublicKey(
 
 export const USDT_DECIMALS = 6;
 
-export const TREASURY_WALLET = new PublicKey(
-    process.env.NEXT_PUBLIC_TREASURY_WALLET || ''
-);
+/**
+ * Treasury wallet public key.
+ * NOTE: Must not throw at module load time because missing/invalid env
+ * breaks every page that imports this file.
+ */
+export const TREASURY_WALLET = (() => {
+    const raw = process.env.NEXT_PUBLIC_TREASURY_WALLET;
+    if (!raw) return null;
+
+    try {
+        return new PublicKey(raw);
+    } catch (e) {
+        console.error('[solanaPaymentApi] Invalid NEXT_PUBLIC_TREASURY_WALLET:', e);
+        return null;
+    }
+})();
 
 export const RPC_URL =
     process.env.NEXT_PUBLIC_SOLANA_RPC_URL || 'https://api.devnet.solana.com';

@@ -25,8 +25,17 @@ export default function Navbar() {
   const walletButtonRef = useRef(null);
   const isCheckingAuth = useRef(false);
 
-  const walletAddress = getWalletAddress() || (typeof window !== 'undefined' ? localStorage.getItem('wallet_address') : null);
-  const walletName = wallet?.adapter?.name || (typeof window !== 'undefined' ? localStorage.getItem('wallet_name') : null);
+  // Wallet address may not be immediately available on first client render; support both
+  // the Solana adapter publicKey source and persisted localStorage values (legacy + current keys).
+  const walletAddress =
+    getWalletAddress() ||
+    (typeof window !== 'undefined'
+      ? localStorage.getItem('walletAddress') || localStorage.getItem('wallet_address')
+      : null);
+
+  const walletName =
+    wallet?.adapter?.name ||
+    (typeof window !== 'undefined' ? localStorage.getItem('wallet_name') || localStorage.getItem('walletName') : null);
 
   const checkAuthStatus = async () => {
     if (isCheckingAuth.current) return;
@@ -128,7 +137,7 @@ export default function Navbar() {
         </nav>
 
         {/* Right actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3" suppressHydrationWarning>
           {walletAddress && (
             <div className="hidden lg:block relative">
               <button ref={walletButtonRef} onClick={() => setIsWalletMenuOpen(!isWalletMenuOpen)} className="flex items-center gap-2 px-3 py-2 bg-[#151925] rounded-lg border border-[#C19A4A]/30 hover:border-[#C19A4A] transition-all cursor-pointer">
@@ -143,7 +152,15 @@ export default function Navbar() {
                   </div>
                   <div className="p-2">
                     <button onClick={() => { navigator.clipboard.writeText(walletAddress); setIsWalletMenuOpen(false); }} className="w-full text-left px-3 py-2 text-sm text-white hover:bg-[#151925] rounded transition-colors">📋 Copy Address</button>
-                    <button onClick={handleSignOut} className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded transition-colors">🔌 Disconnect</button>
+                    <button
+                      onClick={() => {
+                        disconnectWallet();
+                        setIsWalletMenuOpen(false);
+                      }}
+                      className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                    >
+                      🔌 Disconnect
+                    </button>
                   </div>
                 </div>
               )}
@@ -157,7 +174,7 @@ export default function Navbar() {
           )}
           {isLoggedIn ? (
             <button onClick={handleSignOut} className="hidden lg:block py-2 px-5 text-white border border-[#C19A4A] bg-transparent rounded-lg text-[13px] font-medium cursor-pointer transition-all duration-200 hover:text-[#C19A4A]">Sign Out</button>
-          ) : (
+          ) : walletAddress ? null : (
             <button onClick={() => router.push('/login?mode=getstarted')} className="hidden lg:block py-2 px-5 text-white border border-[#C19A4A] bg-transparent rounded-lg text-[13px] font-medium cursor-pointer transition-all duration-200 hover:text-[#C19A4A]">Sign Up / Login</button>
           )}
           <button ref={buttonRef} className="lg:hidden text-[#C19A4A]" onClick={() => setIsMenuOpen(!isMenuOpen)} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>

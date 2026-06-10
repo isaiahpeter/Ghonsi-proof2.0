@@ -106,7 +106,7 @@ function Login() {
         if (needsUserType) {
           setTimeout(() => router.push('/user-type'), 1000);
         } else {
-          setTimeout(() => router.push('home'), 1000);
+          setTimeout(() => router.push('/'), 1000);
         }
       } else {
         console.error('Authentication returned invalid result:', authResult);

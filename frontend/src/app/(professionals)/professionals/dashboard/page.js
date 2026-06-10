@@ -566,10 +566,10 @@ const QuickActions = () => {
       <div className="relative p-[2px] rounded-2xl bg-gradient-to-r from-[#C19A4A] via-[#d9b563] to-blue-500">
         <div className="bg-[#111625] rounded-2xl p-5">
           <div className="grid grid-cols-2 gap-3">
-            <ActionButton icon={Plus} label="Upload New Proof" onClick={() => router.push('/upload')} />
-            <ActionButton icon={Briefcase} label="View Portfolio" onClick={() => router.push('/portfolio')} />
-            <ActionButton icon={Share2} label="Share Profile" onClick={() => router.push('/portfolio')} />
-            <ActionButton icon={Settings} label="Profile Settings" onClick={() => router.push('/settingsPage')} />
+            <ActionButton icon={Plus} label="Upload New Proof" onClick={() => router.push('/professionals/upload')} />
+            <ActionButton icon={Briefcase} label="View Portfolio" onClick={() => router.push('/professionals/portfolio')} />
+            <ActionButton icon={Share2} label="Share Profile" onClick={() => router.push('/professionals/portfolio')} />
+            <ActionButton icon={Settings} label="Profile Settings" onClick={() => router.push('/professionals/settingsPage')} />
           </div>
         </div>
       </div>

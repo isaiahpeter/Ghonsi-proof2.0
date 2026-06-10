@@ -47,7 +47,7 @@ function AuthCallback() {
       // Check if profile exists to decide redirect destination
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
-        .select('id')
+        .select('id, user_type')
         .eq('user_id', session.user.id)
         .maybeSingle(); // Use maybeSingle() to avoid errors if no profile exists
 
@@ -55,10 +55,20 @@ function AuthCallback() {
         console.error('Error checking profile:', profileError);
       }
 
-      // Redirect based on whether profile exists
+      // Redirect based on whether profile exists (and route structure)
+      // Existing app routes are nested under:
+      //  - /professionals/*
+      //  - /hirers/*
       setStatus('✅ Redirecting...');
       setTimeout(() => {
-        router.push(profile ? '/dashboard' : '/createProfile');
+        if (!profile) {
+          // No profile yet: user must pick/complete profile first
+          router.push('/user-type');
+          return;
+        }
+
+        if (profile.user_type === 'hirer') router.push('/hirers/dashboard');
+        else router.push('/professionals/dashboard');
       }, 1000);
 
     } catch (error) {

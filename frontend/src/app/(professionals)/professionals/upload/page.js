@@ -467,13 +467,22 @@ function Upload() {
 
     if (!connected) {
       setUploadError('Please connect your wallet to sign the upload transaction.');
-      try { 
-        await connectWallet(); 
+      try {
+        await connectWallet();
       } catch (err) {
         // User rejected wallet connection - error already shown by wallet adapter
       }
-      return;
+
+      // IMPORTANT: don't exit early if the user connected successfully.
+      // Otherwise the UI still behaves like the page is "locked" until the user clicks submit again.
+      const startedAt = Date.now();
+      while (!connected && Date.now() - startedAt < 10000) {
+        await new Promise((r) => setTimeout(r, 250));
+      }
+
+      if (!connected) return;
     }
+
 
     setIsUploading(true);
     setShowPendingModal(true);
