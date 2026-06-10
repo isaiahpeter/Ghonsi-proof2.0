@@ -40,6 +40,24 @@ function getISOWeek(date) {
 // GOOGLE TRENDS
 // ═══════════════════════════════════════════════════════════════════
 
+/**
+ * @swagger
+ * /api/v1/trends:
+ *   get:
+ *     tags: [Market Data]
+ *     summary: Get latest Google Trends records
+ *     parameters:
+ *       - name: limit
+ *         in: query
+ *         required: false
+ *         schema: { type: integer }
+ *         description: Max records to return (default 20)
+ *     responses:
+ *       200:
+ *         description: Trends records
+ *       500:
+ *         description: Server error
+ */
 router.get('/trends', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit) || 20;
@@ -57,6 +75,18 @@ router.get('/trends', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/v1/trends/run:
+ *   post:
+ *     tags: [Market Data]
+ *     summary: Run Google Trends crawler and store results
+ *     responses:
+ *       200:
+ *         description: Google Trends data inserted
+ *       500:
+ *         description: Server error
+ */
 router.post('/trends/run', async (req, res) => {
   try {
     const { fetchDailyTrends } = await import('../../ghonsi-data-intelligence/src/crawlers/daily/googleTrends.js');
@@ -840,14 +870,18 @@ router.post('/ecommerce/run', async (req, res) => {
  *         in: query
  *         required: true
  *         schema: { type: string }
- *         description: Natural‑language query about Nigerian marketing
+ *         description: Natural-language query about Nigerian marketing
  *       - name: limit
  *         in: query
  *         schema: { type: integer }
- *         description: Max results (default 5)
+ *         description: Max results (default 5) 
  *     responses:
  *       200:
  *         description: Ranked insights with similarity scores
+ *       400:
+ *         description: Missing required query param q
+ *       500:
+ *         description: Server error
  */
 router.get('/insights/search', async (req, res) => {
   const q = req.query.q;

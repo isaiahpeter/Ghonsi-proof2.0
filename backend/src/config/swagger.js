@@ -18,6 +18,7 @@ const options = {
     servers: [
       { url: 'http://localhost:3001', description: 'Local development' },
       { url: 'https://api.ghonsiproof.com', description: 'Production' },
+      { url: process.env.RENDER_EXTERNAL_URL || 'http://localhost:3001', description: 'Render external (or fallback localhost)' },
     ],
     tags: [
       { name: 'Health', description: 'Server health checks' },
@@ -118,7 +119,12 @@ const options = {
       },
     },
   },
-  apis: ['./server.js', './src/routes/market.js'],  // <-- scan both files for JSDoc
+  // IMPORTANT: paths are relative to backend/src/config/ (because swagger-jsdoc resolves them from that file)
+  // Use explicit relative paths so the Market Data annotations are always discovered.
+  apis: [
+    '../..//server.js',
+    '../routes/market.js',
+  ],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
