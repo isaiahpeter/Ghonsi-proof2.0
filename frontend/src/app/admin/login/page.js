@@ -16,7 +16,7 @@ export default function AdminLoginPage() {
     setError('');
 
     // Simple password check — change this to your admin password
-    const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ghonsi-admin-2024';
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ghonsi-admin-2024';
 
     setTimeout(() => {
       if (password === ADMIN_PASSWORD) {
