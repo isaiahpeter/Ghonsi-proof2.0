@@ -459,7 +459,7 @@ function CreateProfile() {
                 onClick={() => {
                 const nextRoute = isEditMode
   ? '/professionals/dashboard'
-  : '/domain-questions-professionals';
+  : '/hirers/domain-questions';
 
 router.push(nextRoute);
                 }} 
