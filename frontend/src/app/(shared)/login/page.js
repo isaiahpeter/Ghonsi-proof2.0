@@ -1,12 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@/hooks/useWallet';
 import { sendOTPToEmail, verifyOTP, signInWithWallet } from '@/utils/supabaseAuth';
 import { supabase } from '@/lib/supabaseClient';
 
-function Login() {
+function LoginInner() {
   const [activeTab, setActiveTab] = useState('wallet');
   const [email, setEmail] = useState('');
   const [otpCode, setOtpCode] = useState('');
@@ -65,7 +65,6 @@ function Login() {
         return;
       }
 
-      // If user_type is missing/unknown, fall back to root.
       router.push('/');
     } catch (e) {
       console.warn('routeAfterUserType failed:', e);
@@ -75,12 +74,9 @@ function Login() {
 
   useEffect(() => {
     const params = new URLSearchParams('');
-    // NOTE: kept original behavior, but this is likely intended to read current location search.
-    // If you want it to work properly, replace with: new URLSearchParams(location?.search)
     setIsGetStarted(params.get('mode') === 'getstarted');
   }, [location]);
 
-  // Check for existing wallet session on mount
   useEffect(() => {
     const checkExistingSession = async () => {
       const walletAddress = localStorage.getItem('wallet_address');
@@ -94,7 +90,6 @@ function Login() {
     checkExistingSession();
   }, [router]);
 
-  // When wallet connects, automatically trigger sign message
   useEffect(() => {
     if (connected && activeTab === 'wallet' && !hasSigned) {
       handleWalletAuth();
@@ -114,9 +109,6 @@ function Login() {
         return;
       }
 
-      console.log('Starting wallet authentication for:', walletAddress);
-
-      // Sign a message to prove wallet ownership
       const messageToSign = `Sign this message to verify your Ghonsi Proof account.\nWallet: ${walletAddress}\nTimestamp: ${Date.now()}`;
       const signResult = await sign(messageToSign);
 
@@ -126,9 +118,6 @@ function Login() {
         return;
       }
 
-      console.log('Message signed successfully');
-
-      // Authenticate with Supabase using wallet signature
       const authResult = await signInWithWallet(walletAddress, {
         signature: signResult.signature,
         publicKey: signResult.publicKey,
@@ -136,20 +125,14 @@ function Login() {
       });
 
       if (authResult && authResult.userId) {
-        console.log('Wallet authentication successful:', authResult.userId);
-
-        // Check if user has a profile with user_type set
         const { data: profile } = await supabase
           .from('profiles')
           .select('user_type')
           .eq('user_id', authResult.userId)
           .single();
 
-        // User needs to select type if: new user OR existing user without user_type
         const needsUserType = authResult.isNewUser || !profile || !profile.user_type;
 
-        // If role is provided, attempt to store it in profiles.user_type
-        // so onboarding can route correctly without manual selection.
         let resolvedUserType = profile?.user_type || null;
         if (needsUserType && roleParam) {
           try {
@@ -170,19 +153,15 @@ function Login() {
         setHasSigned(true);
         setMessage('✅ Wallet verified! Redirecting...');
 
-        // Store additional session info
         localStorage.setItem('auth_method', 'wallet');
         localStorage.setItem('last_login', new Date().toISOString());
 
-        // Dispatch custom event to notify Header of auth change
         window.dispatchEvent(new Event('auth-state-changed'));
 
-        // Requested: domain-question-driven routing
         setTimeout(() => {
           routeAfterUserType({ userId: authResult.userId, currentUserType: resolvedUserType });
         }, 800);
       } else {
-        console.error('Authentication returned invalid result:', authResult);
         setMessage('Failed to authenticate. Please try again.');
       }
     } catch (err) {
@@ -237,14 +216,11 @@ function Login() {
 
     try {
       const result = await verifyOTP(trimmed, otpCode);
-      console.log('OTP verified, user:', result.user?.id, 'isNewUser:', result.isNewUser);
 
       setMessage('Successfully signed in!');
 
-      // Dispatch custom event to notify Header of auth change
       window.dispatchEvent(new Event('auth-state-changed'));
 
-      // Redirect new email users to user type selection (or onboarding directly if role param is provided)
       const userId = result.user?.id;
       let resolvedUserType = result.user?.user_type || null;
 
@@ -271,7 +247,6 @@ function Login() {
           setTimeout(() => router.push('/user-type'), 1000);
         }
       } else {
-        // Existing user: query domain question tables to route
         setTimeout(() => {
           supabase
             .from('profiles')
@@ -309,7 +284,6 @@ function Login() {
           Connect your wallet or sign in to access your proof portfolio
         </p>
 
-        {/* Tabs */}
         <div className="flex flex-row gap-2.5 justify-center items-center mt-5">
           {['wallet', 'email'].map((tab) => (
             <button
@@ -327,7 +301,6 @@ function Login() {
         </div>
       </div>
 
-      {/* WALLET TAB */}
       {activeTab === 'wallet' && (
         <section>
           <div className="bg-white/5 py-[30px] px-5 my-5 mx-5 rounded-xl border border-white/10 flex flex-col items-center gap-5">
@@ -377,7 +350,6 @@ function Login() {
         </section>
       )}
 
-      {/* EMAIL TAB */}
       {activeTab === 'email' && (
         <section>
           <div className="bg-white/5 py-[30px] px-5 my-5 mx-5 rounded-xl border border-[#C19A4A]">
@@ -463,5 +435,10 @@ function Login() {
   );
 }
 
-export default Login;
-
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
+  );
+}
