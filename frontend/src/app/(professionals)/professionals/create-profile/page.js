@@ -456,7 +456,13 @@ function CreateProfile() {
                   : 'Your profile is ready! Next, answer a few questions to help us personalize your experience.'}
               </p>
               <button 
-                onClick={() => router.push(isEditMode ? '/dashboard' : '/domain-questions-professionals')} 
+                onClick={() => {
+                const nextRoute = isEditMode
+  ? '/professionals/dashboard'
+  : '/domain-questions-professionals';
+
+router.push(nextRoute);
+                }} 
                 className="bg-[#C19A4A] hover:bg-[#A8863D] text-black text-sm font-bold px-8 py-3.5 rounded-lg shadow-lg shadow-[#C19A4A]/20 transition-all transform hover:scale-105 active:scale-95 w-full max-w-xs flex items-center justify-center gap-2"
               >
                 {isEditMode ? 'Go to Dashboard' : 'Continue to Questions'} <ArrowRight className="w-4 h-4" />
