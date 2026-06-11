@@ -6,10 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-ghonsi_proof = "CFerqKEGdrVfUrC1GDSRTsPpW9DjrQtqJnYycSNjQb3i"
-
-[registry]
-url = "https://api.apr.dev"
+ghonsi_proof = "8v4agLPGyyKh3WAjuy5rifgMu3JxmKnf9azw9QjM8YYp"
 
 [provider]
 cluster = "devnet"
@@ -17,3 +14,5 @@ wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "npx ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+
+[hooks]

@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-declare_id!("CFerqKEGdrVfUrC1GDSRTsPpW9DjrQtqJnYycSNjQb3i");
+declare_id!("8v4agLPGyyKh3WAjuy5rifgMu3JxmKnf9azw9QjM8YYp");
 
 pub const PROOF_SEED: &[u8] = b"proof";
 
@@ -147,14 +147,8 @@ pub mod ghonsi_proof {
         ipfs_cid: String,
     ) -> Result<()> {
         require!(!ctx.accounts.program_authority.paused, ErrorCode::ProgramPaused);
-
-        // Any admin (not just primary) can submit
-        let authority = &ctx.accounts.program_authority;
-        let caller = ctx.accounts.admin.key();
-        let is_admin = (0..authority.admin_count)
-            .any(|i| authority.admins[i as usize] == caller);
-        require!(is_admin, ErrorCode::Unauthorized);
-
+        // ⚠️  proof_id length is already enforced by the PDA seed derivation
+        // failing if > 32, but we keep the explicit check for a clear error msg.
         require!(proof_id.len() <= 32, ErrorCode::IdTooLong);
         require!(ipfs_cid.len() <= 59, ErrorCode::CidTooLong);
 
@@ -175,12 +169,6 @@ pub mod ghonsi_proof {
     pub fn verify_proof(ctx: Context<AdminProofAction>) -> Result<()> {
         require!(!ctx.accounts.program_authority.paused, ErrorCode::ProgramPaused);
 
-        let authority = &ctx.accounts.program_authority;
-        let caller = ctx.accounts.admin.key();
-        let is_admin = (0..authority.admin_count)
-            .any(|i| authority.admins[i as usize] == caller);
-        require!(is_admin, ErrorCode::Unauthorized);
-
         let clock = Clock::get()?;
         let proof = &mut ctx.accounts.proof;
         require!(
@@ -198,12 +186,6 @@ pub mod ghonsi_proof {
     pub fn reject_proof(ctx: Context<AdminProofAction>, reason: String) -> Result<()> {
         require!(!ctx.accounts.program_authority.paused, ErrorCode::ProgramPaused);
         require!(reason.len() <= 200, ErrorCode::ReasonTooLong);
-
-        let authority = &ctx.accounts.program_authority;
-        let caller = ctx.accounts.admin.key();
-        let is_admin = (0..authority.admin_count)
-            .any(|i| authority.admins[i as usize] == caller);
-        require!(is_admin, ErrorCode::Unauthorized);
 
         let clock = Clock::get()?;
         let proof = &mut ctx.accounts.proof;
@@ -223,14 +205,8 @@ pub mod ghonsi_proof {
 
     /// Primary admin revokes any proof regardless of current status.
     /// No token to thaw — just updates the PDA status.
+    /// Primary admin revokes any proof. Auth enforced by RevokeProof constraint.
     pub fn revoke_proof(ctx: Context<RevokeProof>) -> Result<()> {
-        let authority = &ctx.accounts.program_authority;
-        require_keys_eq!(
-            ctx.accounts.admin.key(),
-            authority.primary_admin,
-            ErrorCode::Unauthorized
-        );
-
         let clock = Clock::get()?;
         let proof = &mut ctx.accounts.proof;
         proof.status = ProofStatus::Revoked;
@@ -329,7 +305,12 @@ pub struct SubmitProof<'info> {
     #[account(seeds = [b"program_authority"], bump)]
     pub program_authority: Account<'info, ProgramAuthority>,
 
-    /// Admin co-signs to authorise the submission. Pays nothing.
+    /// Admin co-signs. Membership enforced via constraint — keeps instruction body clean.
+    #[account(
+        constraint = (0..program_authority.admin_count)
+            .any(|i| program_authority.admins[i as usize] == admin.key())
+            @ ErrorCode::Unauthorized
+    )]
     pub admin: Signer<'info>,
 
     pub system_program: Program<'info, System>,
@@ -341,6 +322,12 @@ pub struct AdminProofAction<'info> {
     #[account(mut)]
     pub proof: Account<'info, Proof>,
 
+    /// Admin membership enforced here so instruction bodies stay focused on logic only.
+    #[account(
+        constraint = (0..program_authority.admin_count)
+            .any(|i| program_authority.admins[i as usize] == admin.key())
+            @ ErrorCode::Unauthorized
+    )]
     pub admin: Signer<'info>,
 
     #[account(seeds = [b"program_authority"], bump)]
@@ -352,7 +339,10 @@ pub struct RevokeProof<'info> {
     #[account(mut)]
     pub proof: Account<'info, Proof>,
 
-    /// Must be primary admin — validated in instruction body.
+    /// Primary admin only — enforced via constraint instead of instruction body.
+    #[account(
+        constraint = admin.key() == program_authority.primary_admin @ ErrorCode::Unauthorized
+    )]
     pub admin: Signer<'info>,
 
     #[account(seeds = [b"program_authority"], bump)]
