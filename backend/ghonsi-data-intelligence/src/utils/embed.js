@@ -1,55 +1,37 @@
-import 'dotenv/config';
+// src/utils/embed.js
+import { pipeline } from '@xenova/transformers';
 import { createClient } from '@supabase/supabase-js';
 
-const OPENROUTER_EMBED_URL = 'https://openrouter.ai/api/v1/embeddings';
-const FREE_EMBED_MODEL = 'nvidia/llama-nemotron-embed-vl-1b-v2:free';
+let embedder;
+let supabase;
 
-// ------------------------------------------------------------
-// Supabase client
-// ------------------------------------------------------------
 function getSupabase() {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
-  if (!process.env.SUPABASE_URL || !serviceKey) {
-    throw new Error('[embed] Missing SUPABASE_URL or SUPABASE_SERVICE_KEY');
+  if (!supabase) {
+    supabase = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
   }
-  return createClient(process.env.SUPABASE_URL, serviceKey);
+  return supabase;
 }
 
-// ------------------------------------------------------------
-// Store a content embedding + metadata
-// ------------------------------------------------------------
-export async function embedAndStore(content, metadata) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) {
-    console.error('[embed] OPENROUTER_API_KEY not set – skipping embed');
-    return;
+async function getEmbedder() {
+  if (!embedder) {
+    console.log('[embed] Loading local model (all-MiniLM-L6-v2) …');
+    embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    console.log('[embed] Model loaded');
   }
+  return embedder;
+}
 
+export async function embedAndStore(content, metadata) {
   try {
-    const response = await fetch(OPENROUTER_EMBED_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: FREE_EMBED_MODEL,
-        input: [
-          { content: [{ type: 'text', text: content }] }
-        ],
-        encoding_format: 'float',
-      }),
-    });
+    const pipe = await getEmbedder();
+    const output = await pipe(content, { pooling: 'mean', normalize: true });
+    const embedding = Array.from(output.data);
 
-    const json = await response.json();
-    const embedding = json.data?.[0]?.embedding;
-    if (!embedding) {
-      console.error('[embed] No embedding returned:', JSON.stringify(json).slice(0, 300));
-      return;
-    }
-
-    const supabase = getSupabase();
-    const { error } = await supabase
+    const client = getSupabase();
+    const { error } = await client
       .from('ghonsi_embeddings')
       .insert({
         chunk_text: content,
@@ -70,31 +52,8 @@ export async function embedAndStore(content, metadata) {
   }
 }
 
-// ------------------------------------------------------------
-// Generate an embedding for a search query
-// ------------------------------------------------------------
 export async function embedQuery(text) {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) throw new Error('[embedQuery] OPENROUTER_API_KEY not set');
-
-  const response = await fetch(OPENROUTER_EMBED_URL, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: FREE_EMBED_MODEL,
-      input: [
-        { content: [{ type: 'text', text: text }] }
-      ],
-      encoding_format: 'float',
-    }),
-  });
-
-  const json = await response.json();
-  if (!json.data?.[0]?.embedding) {
-    throw new Error('[embedQuery] Failed: ' + JSON.stringify(json));
-  }
-  return json.data[0].embedding;
+  const pipe = await getEmbedder();
+  const output = await pipe(text, { pooling: 'mean', normalize: true });
+  return Array.from(output.data);
 }
