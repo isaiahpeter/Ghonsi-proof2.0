@@ -1,6 +1,6 @@
-# TODO
+# TODO - Ghonsi-proof2.0
 
-- [x] Add Swagger JSDoc annotations for all market routes in `backend/src/routes/market.js` (except existing `/api/v1/insights/search` block), so they show correctly in Swagger UI under `/api-docs` (in progress).
-- [ ] Ensure each route block uses correct HTTP method + full path (including `/api/v1` mount).
-- [ ] Verify Swagger renders endpoints (manual check via `/api-docs` or `/api-docs.json`).
+- [x] Fix one-time news key_values.source='unknown' backfill using provided Supabase SQL.
+- [x] Standardize daily scheduler job invocation in `backend/ghonsi-data-intelligence/src/scheduler/index.js` so `runAndLog` always receives a function that is called.
+- [ ] Restart backend and verify scheduler logs show daily jobs running.
 

@@ -2,7 +2,7 @@ import * as anchor from "@coral-xyz/anchor";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { readFileSync } from "fs";
 
-const PROGRAM_ID = new PublicKey("8v4agLPGyyKh3WAjuy5rifgMu3JxmKnf9azw9QjM8YYp");
+const PROGRAM_ID = new PublicKey("CFerqKEGdrVfUrC1GDSRTsPpW9DjrQtqJnYycSNjQb3i");
 const COLLECTION_MINT = new PublicKey("C3CYgA98HY2YTnmCqzrJRoTYWDjoVeFdY57FqxWTaXFW");
 const RPC = "https://api.devnet.solana.com";
 

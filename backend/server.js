@@ -12,14 +12,6 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors());
-app.use('/api/v1', (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  next();
-});
 app.use(express.json());
 
 // ───────────────────────
@@ -30,6 +22,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
 }));
 app.get('/api-docs.json', (req, res) => res.json(swaggerSpec));
+
 const fs = require('fs').promises;
 const path = require('path');
 const JOBS_FILE = path.join(__dirname, 'jobs.json');
@@ -252,7 +245,7 @@ const deriveProgramAuthorityPda = (programId) => {
  *       500:
  *         description: Server error
  */
-app.post("/api/prepare-mint", async (req, res) => {
+app.post('/api/prepare-mint', createSolanaPaymentMiddleware({ amount: '200000', description: 'Proof upload — $0.20 USDT' }), async (req, res) => {
   try {
     // LOG EVERYTHING WE RECEIVE
     console.log('═══════════════════════════════════════');
@@ -307,7 +300,7 @@ app.post("/api/prepare-mint", async (req, res) => {
     const programAuthorityPda = deriveProgramAuthorityPda(programId);
 
     const tx = await program.methods
-      .submitProof(proofId, ipfsUri)
+      .submitProof(proofId, title, ipfsUri, proofType)
       .accounts({
         owner: ownerPublicKey,
         proof: proofPda,
@@ -319,7 +312,7 @@ app.post("/api/prepare-mint", async (req, res) => {
 
     const { blockhash } = await connection.getLatestBlockhash();
     tx.recentBlockhash = blockhash;
-    tx.feePayer = ownerPublicKey; // owner pays rent (payer-is-signer)
+    tx.feePayer = adminKeypair.publicKey; // admin pays rent — owner just co-signs
     tx.partialSign(adminKeypair);
 
     const serialized = tx.serialize({ requireAllSignatures: false });
@@ -409,7 +402,7 @@ app.post('/api/submit-proof', async (req, res) => {
 
     // 4 args — description stays off-chain in Supabase
     const tx = await program.methods
-      .submitProof(proofId, ipfsUri)
+      .submitProof(proofId, title, ipfsUri, proofType)
       .accounts({
         owner: ownerPublicKey,
         proof: proofPda,
@@ -529,7 +522,7 @@ app.post('/api/migrate-to-mainnet', async (req, res) => {
 
         // 4 args — description stays off-chain in Supabase
         const tx = await program.methods
-          .submitProof(proofId, ipfsUri)
+          .submitProof(proofId, title, ipfsUri, proofType)
           .accounts({
             owner: ownerPublicKey,
             proof: proofPda,
