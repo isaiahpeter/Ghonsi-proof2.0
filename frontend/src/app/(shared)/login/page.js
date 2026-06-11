@@ -6,6 +6,8 @@ import { useWallet } from '@/hooks/useWallet';
 import { sendOTPToEmail, verifyOTP, signInWithWallet } from '@/utils/supabaseAuth';
 import { supabase } from '@/lib/supabaseClient';
 
+export const dynamic = 'force-dynamic';
+
 function LoginInner() {
   const [activeTab, setActiveTab] = useState('wallet');
   const [email, setEmail] = useState('');
