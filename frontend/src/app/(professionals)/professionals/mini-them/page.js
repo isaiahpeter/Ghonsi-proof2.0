@@ -105,10 +105,23 @@ function MiniThemHandover() {
         const { getDomainQuestionsProfessionals } = await import('@/utils/domainQuestionsApi');
         const domainQuestions = await getDomainQuestionsProfessionals(user.id);
         
+        // If domain questions aren’t completed, do NOT block the flow.
+        // Fall back to generic Nigerian marketing defaults.
         if (!domainQuestions) {
-          alert('No domain questions responses found. Please complete the domain questions first.');
-          setShowSelectionModal(true);
-          setLoading(false);
+          setScanResults({
+            totalProofsAnalyzed: 0,
+            learnedSkills: ['Nigerian Market Specialist', 'Consumer Insights'],
+            styleSummary: 'Marketing specialist focused on Nigerian consumer behaviour and conversion tactics',
+            commonPatterns: [
+              'Targets Nigerian consumers',
+              'Operates primarily in Nigeria',
+              'Uses practical, evidence-based messaging',
+            ],
+          });
+          setAiSummary(
+            "I'm your AI marketing specialist configured for the Nigerian market. I will provide practical marketing strategies grounded in local consumer behaviour and ecommerce realities."
+          );
+          setCurrentStep(2);
           return;
         }
 
